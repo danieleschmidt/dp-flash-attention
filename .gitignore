@@ -205,3 +205,62 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# CUDA compiled files
+*.ptx
+*.cubin
+*.fatbin
+
+# PyTorch
+*.pth
+*.pt
+
+# Triton cache
+~/.triton/
+
+# NVIDIA
+*.nv-*
+
+# Checkpoints and models
+checkpoints/
+models/
+*.ckpt
+*.safetensors
+
+# Data directories
+data/
+datasets/
+*.h5
+*.hdf5
+
+# Logs and outputs
+logs/
+outputs/
+wandb/
+tensorboard/
+lightning_logs/
+
+# Benchmarking results
+benchmark_results/
+
+# Privacy testing data
+privacy_test_data/
+shadow_models/
+
+# Security
+.env.local
+.env.production
+*.key
+*.pem
+*.crt
+secrets/
+
+# AI/ML specific
+mlruns/
+.mlflow/
+.dvc/
+.neptune/
+
+# SLURM
+slurm-*.out
+*.sbatch.log
