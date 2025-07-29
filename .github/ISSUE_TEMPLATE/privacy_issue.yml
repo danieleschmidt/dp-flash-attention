@@ -1,0 +1,189 @@
+name: Privacy Issue
+description: Report privacy-related concerns or questions about differential privacy guarantees
+title: "[PRIVACY] "
+labels: ["privacy", "needs-review"]
+assignees:
+  - danieleschmidt
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a privacy-related issue with DP-Flash-Attention.
+        
+        **⚠️ IMPORTANT: If this is a security vulnerability, please report it privately via security@dp-flash-attention.org instead of creating a public issue.**
+
+  - type: dropdown
+    id: privacy-type
+    attributes:
+      label: Privacy Issue Type
+      description: What type of privacy issue are you reporting?
+      options:
+        - Privacy guarantee violation
+        - Incorrect privacy parameter handling
+        - Privacy budget accounting error
+        - Noise generation issue
+        - Composition analysis problem
+        - Documentation clarity issue
+        - Privacy parameter validation bug
+        - Other privacy concern
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Privacy Impact Severity
+      description: How severe is this privacy issue?
+      options:
+        - Critical - Privacy guarantees completely broken
+        - High - Significant privacy leakage possible
+        - Medium - Minor privacy parameter issues
+        - Low - Documentation or usability improvement
+    validations:
+      required: true
+
+  - type: textarea
+    id: privacy-description
+    attributes:
+      label: Privacy Issue Description
+      description: Detailed description of the privacy concern
+      placeholder: |
+        Please describe:
+        - What privacy guarantees are affected
+        - How the issue manifests
+        - Expected vs. actual privacy behavior
+        - Potential privacy implications
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction-steps
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this privacy issue?
+      placeholder: |
+        1. Initialize DP attention with parameters...
+        2. Run training with...
+        3. Observe privacy budget consumption...
+        4. Notice that...
+      value: |
+        1. 
+        2. 
+        3. 
+        4. 
+    validations:
+      required: true
+
+  - type: textarea
+    id: code-example
+    attributes:
+      label: Code Example
+      description: Minimal code example demonstrating the issue
+      render: python
+      placeholder: |
+        import dp_flash_attention
+        
+        # Code that demonstrates the privacy issue
+        dp_attn = dp_flash_attention.DPFlashAttention(
+            embed_dim=768,
+            num_heads=12,
+            epsilon=1.0,  # Privacy parameters
+            delta=1e-5
+        )
+        
+        # Issue occurs here...
+
+  - type: textarea
+    id: privacy-parameters
+    attributes:
+      label: Privacy Parameters Used
+      description: What privacy parameters were you using?
+      placeholder: |
+        - Epsilon (ε): 
+        - Delta (δ): 
+        - Clipping norm: 
+        - Noise multiplier: 
+        - Batch size: 
+        - Number of training steps: 
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-privacy
+    attributes:
+      label: Expected Privacy Behavior
+      description: What privacy guarantees did you expect?
+      placeholder: |
+        Describe the expected privacy behavior, including:
+        - Privacy budget consumption
+        - Noise characteristics
+        - Composition properties
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual-privacy
+    attributes:
+      label: Actual Privacy Behavior
+      description: What actually happened with privacy?
+      placeholder: |
+        Describe what actually happened:
+        - Observed privacy violations
+        - Incorrect budget accounting
+        - Unexpected noise behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment Information
+      description: Your system configuration
+      value: |
+        - DP-Flash-Attention version: 
+        - PyTorch version: 
+        - CUDA version: 
+        - GPU model: 
+        - Python version: 
+        - Operating system: 
+    validations:
+      required: true
+
+  - type: textarea
+    id: privacy-analysis
+    attributes:
+      label: Privacy Analysis (Optional)
+      description: Any additional analysis of the privacy implications
+      placeholder: |
+        If you have performed any analysis:
+        - Theoretical privacy bounds
+        - Empirical privacy measurements
+        - Membership inference attack results
+        - Privacy amplification calculations
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      description: Please verify these items before submitting
+      options:
+        - label: I have searched existing issues for similar privacy concerns
+          required: true
+        - label: I have verified this is not a security vulnerability (if it is, I will report privately)
+          required: true
+        - label: I have provided sufficient information to reproduce the issue
+          required: true
+        - label: I have included the privacy parameters and environment details
+          required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Privacy Reporting Guidelines
+        
+        - **Be specific** about privacy parameters and expected guarantees
+        - **Include reproducible examples** with exact parameter values  
+        - **Consider the scope** of the privacy issue (single query vs. full training)
+        - **Provide context** about your use case and privacy requirements
+        
+        Our privacy team will review this issue promptly and may request additional information to properly assess the privacy implications.
