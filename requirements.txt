@@ -1,0 +1,12 @@
+# Core dependencies for DP-Flash-Attention
+torch>=2.3.0
+triton>=2.3.0
+einops>=0.7.0
+numpy>=1.24.0
+ninja>=1.11.0
+pybind11>=2.11.0
+
+# Differential Privacy libraries
+opacus>=1.4.0
+dp-accounting>=0.4.0
+prv-accountant>=0.2.0

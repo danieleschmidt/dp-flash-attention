@@ -1,0 +1,214 @@
+[build-system]
+requires = ["setuptools>=64", "wheel", "ninja", "pybind11>=2.11.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dp-flash-attention"
+version = "0.1.0"
+description = "Hardware-accelerated differentially private Flash-Attention 3 implementation"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Daniel Schmidt", email = "daniel@dp-flash-attention.org"}
+]
+maintainers = [
+    {name = "Daniel Schmidt", email = "daniel@dp-flash-attention.org"}
+]
+keywords = ["differential-privacy", "attention", "cuda", "pytorch", "flash-attention"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: C++",
+    "Programming Language :: CUDA",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Security :: Cryptography",
+]
+requires-python = ">=3.10"
+dependencies = [
+    "torch>=2.3.0",
+    "triton>=2.3.0",
+    "einops>=0.7.0",
+    "numpy>=1.24.0",
+    "ninja>=1.11.0",
+    "pybind11>=2.11.0",
+    "opacus>=1.4.0",
+    "dp-accounting>=0.4.0",
+    "prv-accountant>=0.2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "pytest-benchmark>=4.0.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.5.0",
+    "pre-commit>=3.4.0",
+    "sphinx>=7.1.0",
+    "sphinx-rtd-theme>=1.3.0",
+    "jupyter>=1.0.0",
+    "matplotlib>=3.7.0",
+    "seaborn>=0.12.0",
+    "pandas>=2.0.0",
+]
+test = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "pytest-benchmark>=4.0.0",
+    "hypothesis>=6.82.0",
+]
+docs = [
+    "sphinx>=7.1.0",
+    "sphinx-rtd-theme>=1.3.0",
+    "myst-parser>=2.0.0",
+    "sphinx-autoapi>=3.0.0",
+]
+cuda = [
+    "cupy-cuda12x>=12.0.0",
+    "nvidia-ml-py>=12.535.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/dp-flash-attention"
+Repository = "https://github.com/yourusername/dp-flash-attention.git"
+Issues = "https://github.com/yourusername/dp-flash-attention/issues"
+Documentation = "https://dp-flash-attention.readthedocs.io"
+Changelog = "https://github.com/yourusername/dp-flash-attention/blob/main/CHANGELOG.md"
+
+[project.scripts]
+dp-flash-benchmark = "dp_flash_attention.cli:benchmark"
+dp-privacy-audit = "dp_flash_attention.cli:privacy_audit"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+dp_flash_attention = ["kernels/*.cu", "kernels/*.h", "py.typed"]
+
+# Black configuration
+[tool.black]
+line-length = 88
+target-version = ["py310", "py311", "py312"]
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+# Ruff configuration
+[tool.ruff]
+target-version = "py310"
+line-length = 88
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "UP", # pyupgrade
+]
+ignore = [
+    "E501",  # line too long, handled by black
+    "B008",  # do not perform function calls in argument defaults
+    "C901",  # too complex
+]
+
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401"]
+"tests/**/*.py" = ["F401", "F811"]
+
+# MyPy configuration
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+module = [
+    "triton.*",
+    "cupy.*",
+    "opacus.*",
+    "dp_accounting.*",
+    "prv_accountant.*",
+    "nvidia_ml_py.*"
+]
+ignore_missing_imports = true
+
+# Pytest configuration
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = [
+    "-ra",
+    "--strict-markers",
+    "--strict-config",
+    "--cov=dp_flash_attention",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml",
+]
+testpaths = ["tests"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "gpu: marks tests as requiring GPU hardware",
+    "privacy: marks tests as privacy-related",
+    "benchmark: marks tests as benchmarks",
+    "integration: marks tests as integration tests",
+]
+filterwarnings = [
+    "ignore::UserWarning",
+    "ignore::DeprecationWarning",
+]
+
+# Coverage configuration
+[tool.coverage.run]
+source = ["src"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+    "*/__pycache__/*",
+    "*/build/*",
+    "*/dist/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
