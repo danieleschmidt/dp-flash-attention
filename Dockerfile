@@ -2,7 +2,7 @@
 # Supports development and production environments with CUDA
 
 # Base CUDA image with PyTorch support
-FROM nvidia/cuda:12.1-devel-ubuntu22.04 as base
+FROM nvidia/cuda:12.9.1-devel-ubuntu22.04 as base
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
