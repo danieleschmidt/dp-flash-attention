@@ -1,0 +1,280 @@
+name: Security Scanning
+
+on:
+  schedule:
+    - cron: '0 3 * * *'  # Daily at 3 AM UTC
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'src/**'
+      - 'requirements*.txt'
+      - 'pyproject.toml'
+  workflow_dispatch:
+
+jobs:
+  dependency-scan:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+        
+    - name: Install scanning tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install safety pip-audit
+        
+    - name: Scan dependencies with Safety
+      run: |
+        safety check --json --output safety-report.json
+        safety check --short-report
+      continue-on-error: true
+      
+    - name: Scan dependencies with pip-audit
+      run: |
+        pip-audit --format=json --output=pip-audit-report.json
+        pip-audit --format=columns
+      continue-on-error: true
+      
+    - name: Upload dependency scan results
+      uses: actions/upload-artifact@v3
+      with:
+        name: dependency-scan-results
+        path: "*-report.json"
+
+  static-analysis:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+        
+    - name: Install analysis tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install bandit semgrep
+        
+    - name: Run Bandit security scan
+      run: |
+        bandit -r src/ -f json -o bandit-report.json
+        bandit -r src/ --severity-level medium
+      continue-on-error: true
+      
+    - name: Run Semgrep security scan
+      run: |
+        semgrep --config=auto --json --output=semgrep-report.json src/
+        semgrep --config=auto src/
+      continue-on-error: true
+      
+    - name: Upload static analysis results
+      uses: actions/upload-artifact@v3
+      with:
+        name: static-analysis-results
+        path: "*-report.json"
+
+  privacy-security:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+        
+    - name: Install privacy tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ".[test,dev]"
+        
+    - name: Validate privacy parameter bounds
+      run: |
+        python -c "
+        import numpy as np
+        from dp_flash_attention.privacy import RenyiAccountant
+        
+        # Test extreme privacy parameters
+        try:
+            accountant = RenyiAccountant()
+            accountant.add_step(epsilon=0.001, delta=1e-10, sampling_rate=0.001)
+            eps = accountant.get_epsilon(delta=1e-10)
+            assert eps > 0, 'Privacy calculation failed'
+            print('✅ Privacy bounds validation passed')
+        except Exception as e:
+            print(f'❌ Privacy bounds validation failed: {e}')
+            exit(1)
+        "
+        
+    - name: Check for hardcoded privacy parameters
+      run: |
+        # Search for potential hardcoded privacy values
+        grep -r "epsilon.*=" src/ || true
+        grep -r "delta.*=" src/ || true
+        
+        # Ensure no test privacy keys are present
+        ! grep -r "test.*key" src/
+        ! grep -r "debug.*privacy" src/
+
+  license-compliance:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+        
+    - name: Install license checking tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install pip-licenses licensecheck
+        
+    - name: Check dependency licenses
+      run: |
+        pip install -e .
+        pip-licenses --format=json --output-file=licenses.json
+        pip-licenses --format=plain-vertical
+        
+    - name: Validate license compatibility
+      run: |
+        # Check for GPL or other copyleft licenses that may conflict
+        python -c "
+        import json
+        with open('licenses.json') as f:
+            licenses = json.load(f)
+        
+        problematic = ['GPL', 'AGPL', 'LGPL']
+        issues = []
+        
+        for pkg in licenses:
+            for prob in problematic:
+                if prob in pkg.get('License', ''):
+                    issues.append(f'{pkg[\"Name\"]}: {pkg[\"License\"]}')
+        
+        if issues:
+            print('❌ License compatibility issues found:')
+            for issue in issues:
+                print(f'  - {issue}')
+            exit(1)
+        else:
+            print('✅ License compatibility check passed')
+        "
+        
+    - name: Upload license report
+      uses: actions/upload-artifact@v3
+      with:
+        name: license-report  
+        path: licenses.json
+
+  codeql:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+      
+    steps:
+    - uses: actions/checkout@v4
+      
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: python
+        queries: security-extended,security-and-quality
+        
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v2
+      
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+
+  container-security:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      
+    - name: Build development container
+      run: |
+        docker build -f .devcontainer/Dockerfile -t dp-flash-attention:dev .
+        
+    - name: Scan container with Trivy
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'dp-flash-attention:dev'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+        
+    - name: Upload Trivy scan results
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Full history for secret scanning
+        
+    - name: Run GitLeaks secret scan
+      uses: gitleaks/gitleaks-action@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Check for common secret patterns
+      run: |
+        # Check for API keys, tokens, etc.
+        ! grep -r "api_key.*=" . --exclude-dir=.git
+        ! grep -r "secret.*=" . --exclude-dir=.git  
+        ! grep -r "password.*=" . --exclude-dir=.git
+        ! grep -r "token.*=" . --exclude-dir=.git
+        echo "✅ No obvious secrets found in repository"
+
+  security-report:
+    needs: [dependency-scan, static-analysis, privacy-security, license-compliance]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v3
+      
+    - name: Generate security summary
+      run: |
+        echo "## Security Scan Summary" > security-summary.md
+        echo "" >> security-summary.md
+        
+        echo "### Dependency Scans" >> security-summary.md  
+        if [ -f dependency-scan-results/safety-report.json ]; then
+          echo "- Safety scan completed" >> security-summary.md
+        fi
+        if [ -f dependency-scan-results/pip-audit-report.json ]; then
+          echo "- Pip-audit scan completed" >> security-summary.md
+        fi
+        
+        echo "" >> security-summary.md
+        echo "### Static Analysis" >> security-summary.md
+        if [ -f static-analysis-results/bandit-report.json ]; then
+          echo "- Bandit security scan completed" >> security-summary.md
+        fi
+        if [ -f static-analysis-results/semgrep-report.json ]; then
+          echo "- Semgrep security scan completed" >> security-summary.md
+        fi
+        
+        echo "" >> security-summary.md
+        echo "Generated on: $(date)" >> security-summary.md
+        
+    - name: Upload security summary
+      uses: actions/upload-artifact@v3
+      with:
+        name: security-summary
+        path: security-summary.md
