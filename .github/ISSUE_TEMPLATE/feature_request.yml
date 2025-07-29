@@ -1,0 +1,242 @@
+name: ✨ Feature Request
+description: Suggest a new feature or enhancement for DP-Flash-Attention
+title: "[Feature]: "
+labels: ["enhancement", "triage"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a feature! We appreciate ideas for improving DP-Flash-Attention.
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-flight Checklist
+      description: Please confirm you have completed the following
+      options:
+        - label: I have searched existing issues and discussions for similar requests
+          required: true
+        - label: I have read the [Contributing Guidelines](https://github.com/yourusername/dp-flash-attention/blob/main/CONTRIBUTING.md)
+          required: true
+        - label: I have reviewed the project roadmap and documentation
+          required: true
+
+  - type: dropdown
+    id: feature-type
+    attributes:
+      label: Feature Category
+      description: What type of feature is this?
+      options:
+        - New DP Mechanism
+        - Performance Optimization
+        - CUDA Kernel Enhancement
+        - API Improvement
+        - Documentation Enhancement
+        - Integration/Compatibility
+        - Testing/Quality Assurance
+        - Security Enhancement
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Feature Summary
+      description: A clear and concise description of the feature you'd like to see
+      placeholder: Describe the feature you want...
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: What problem does this feature solve? What use case does it enable?
+      placeholder: |
+        I'm trying to do X, but currently I can't because...
+        This would help with Y use case...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe your preferred solution in detail
+      placeholder: |
+        I suggest implementing...
+        This could work by...
+        The API could look like...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternative Solutions
+      description: Describe any alternative solutions you've considered
+      placeholder: |
+        Alternative 1: ...
+        Alternative 2: ...
+        I ruled out X because...
+    validations:
+      required: false
+
+  - type: textarea
+    id: api-design
+    attributes:
+      label: API Design (if applicable)
+      description: Show what the API would look like
+      render: python
+      placeholder: |
+        # Example usage
+        from dp_flash_attention import NewFeature
+        
+        feature = NewFeature(param1=value1, param2=value2)
+        result = feature.process(input_data)
+    validations:
+      required: false
+
+  - type: dropdown
+    id: privacy-impact
+    attributes:
+      label: Privacy Impact
+      description: Does this feature affect privacy guarantees?
+      options:
+        - "No privacy impact"
+        - "Improves privacy guarantees"
+        - "Changes privacy analysis"
+        - "Requires new privacy validation"
+        - "Privacy impact unclear"
+    validations:
+      required: true
+
+  - type: textarea
+    id: privacy-analysis
+    attributes:
+      label: Privacy Analysis (if applicable)
+      description: Explain the privacy implications
+      placeholder: |
+        This feature affects privacy by...
+        The theoretical guarantees would...
+        Additional privacy validation needed for...
+    validations:
+      required: false
+
+  - type: dropdown
+    id: performance-impact
+    attributes:
+      label: Performance Impact
+      description: What performance impact do you expect?
+      options:
+        - "No performance impact"
+        - "Performance improvement expected"
+        - "Minor performance overhead acceptable"
+        - "Performance impact unclear"
+        - "Performance-critical feature"
+    validations:
+      required: true
+
+  - type: textarea
+    id: implementation
+    attributes:
+      label: Implementation Considerations
+      description: Technical details about implementation
+      placeholder: |
+        This would require changes to...
+        Potential challenges include...
+        Dependencies needed: ...
+        CUDA kernel changes: ...
+    validations:
+      required: false
+
+  - type: textarea
+    id: testing
+    attributes:
+      label: Testing Strategy
+      description: How should this feature be tested?
+      placeholder: |
+        Unit tests needed for...
+        Integration tests should cover...
+        Privacy tests must validate...
+        Performance benchmarks for...
+    validations:
+      required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority Level
+      description: How important is this feature to you?
+      options:
+        - "Nice to have"
+        - "Would be helpful"
+        - "Important for my use case"
+        - "Critical for adoption"
+        - "Blocking current work"
+    validations:
+      required: true
+
+  - type: textarea
+    id: timeline
+    attributes:
+      label: Timeline
+      description: Any specific timeline requirements?
+      placeholder: |
+        Needed by: [date]
+        Reason for timeline: ...
+        Flexible timing acceptable
+    validations:
+      required: false
+
+  - type: textarea
+    id: contribution
+    attributes:
+      label: Contribution Interest
+      description: Are you interested in contributing to this feature?
+      placeholder: |
+        I would be interested in:
+        - [ ] Designing the API
+        - [ ] Implementing the feature
+        - [ ] Writing tests
+        - [ ] Writing documentation
+        - [ ] Code review
+        - [ ] Not able to contribute code but happy to test
+    validations:
+      required: false
+
+  - type: textarea
+    id: research
+    attributes:
+      label: Research Background
+      description: Relevant research papers, references, or prior art
+      placeholder: |
+        Related papers:
+        - Paper 1: [link]
+        - Paper 2: [link]
+        
+        Similar implementations:
+        - Library A: [description]
+        - Method B: [description]
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Any other context, mockups, or examples
+      placeholder: Add any other context, diagrams, or examples...
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: acknowledgment
+    attributes:
+      label: Acknowledgment
+      options:
+        - label: I understand this is a research-oriented library and some features may require significant development time
+        - label: I acknowledge that privacy-related features require additional review and validation
+        - label: I'm willing to participate in design discussions and testing if needed
