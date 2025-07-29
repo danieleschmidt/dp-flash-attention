@@ -1,0 +1,129 @@
+# Docker Compose configuration for DP-Flash-Attention development
+version: '3.8'
+
+services:
+  # Development environment with CUDA support
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    volumes:
+      - .:/workspaces/dp-flash-attention
+      - venv-cache:/workspaces/dp-flash-attention/.venv
+    environment:
+      - CUDA_VISIBLE_DEVICES=all
+      - PYTHONPATH=/workspaces/dp-flash-attention/src
+    working_dir: /workspaces/dp-flash-attention
+    command: tail -f /dev/null  # Keep container running
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  # Testing environment
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: testing
+    volumes:
+      - .:/workspaces/dp-flash-attention
+    environment:
+      - CUDA_VISIBLE_DEVICES=all
+      - PYTHONPATH=/workspaces/dp-flash-attention/src
+    command: python -m pytest tests/ -v
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  # Production-like environment
+  prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    environment:
+      - CUDA_VISIBLE_DEVICES=all
+    command: python -c "import dp_flash_attention; dp_flash_attention.privacy_check()"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  # Documentation server
+  docs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    volumes:
+      - .:/workspaces/dp-flash-attention
+    working_dir: /workspaces/dp-flash-attention
+    command: make docs-serve
+    ports:
+      - "8000:8000"
+
+  # Jupyter notebook server for examples
+  jupyter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    volumes:
+      - .:/workspaces/dp-flash-attention
+    environment:
+      - CUDA_VISIBLE_DEVICES=all
+      - PYTHONPATH=/workspaces/dp-flash-attention/src
+    working_dir: /workspaces/dp-flash-attention
+    command: jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root --NotebookApp.token=''
+    ports:
+      - "8888:8888"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  # Benchmarking service
+  benchmark:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    volumes:
+      - .:/workspaces/dp-flash-attention
+      - ./benchmark_results:/app/benchmark_results
+    environment:
+      - CUDA_VISIBLE_DEVICES=all
+      - PYTHONPATH=/workspaces/dp-flash-attention/src
+    working_dir: /workspaces/dp-flash-attention
+    command: python -m pytest tests/benchmarks/ -v --benchmark-only --benchmark-json=benchmark_results/results.json
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+volumes:
+  venv-cache:
+    driver: local
+
+# Network configuration
+networks:
+  default:
+    driver: bridge

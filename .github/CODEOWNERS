@@ -1,0 +1,45 @@
+# CODEOWNERS for DP-Flash-Attention
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Global owners - require review from maintainers for all changes
+* @danieleschmidt
+
+# Core library code requires privacy experts
+/src/dp_flash_attention/ @danieleschmidt
+/src/dp_flash_attention/core/ @danieleschmidt
+/src/dp_flash_attention/privacy/ @danieleschmidt
+
+# CUDA kernels require performance and security review
+/src/dp_flash_attention/kernels/ @danieleschmidt
+*.cu @danieleschmidt
+*.cuh @danieleschmidt
+
+# Privacy-critical tests require additional scrutiny
+/tests/privacy/ @danieleschmidt
+/tests/integration/ @danieleschmidt
+
+# Documentation updates
+/docs/ @danieleschmidt
+README.md @danieleschmidt
+CONTRIBUTING.md @danieleschmidt
+SECURITY.md @danieleschmidt
+
+# Build and CI configuration
+pyproject.toml @danieleschmidt
+Makefile @danieleschmidt
+.github/ @danieleschmidt
+.pre-commit-config.yaml @danieleschmidt
+
+# Security-sensitive files require security team review
+SECURITY.md @danieleschmidt
+.github/workflows/security.yml @danieleschmidt
+scripts/security_*.py @danieleschmidt
+
+# Release management
+CHANGELOG.md @danieleschmidt
+requirements*.txt @danieleschmidt
+
+# Development environment
+.devcontainer/ @danieleschmidt
+Dockerfile* @danieleschmidt
+docker-compose*.yml @danieleschmidt
