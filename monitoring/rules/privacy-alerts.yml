@@ -1,0 +1,168 @@
+# Privacy-specific alerting rules for DP-Flash-Attention
+# Critical alerts for privacy budget exhaustion and security incidents
+
+groups:
+  - name: privacy_budget_alerts
+    rules:
+      # Critical: Privacy budget near exhaustion
+      - alert: PrivacyBudgetCritical
+        expr: dp_privacy_budget_remaining < 0.1
+        for: 1m
+        labels:
+          severity: critical
+          service: dp-flash-attention
+          alert_type: privacy
+        annotations:
+          summary: "Privacy budget critically low"
+          description: "Privacy budget remaining is {{ $value }}, below critical threshold of 0.1"
+          runbook_url: "https://dp-flash-attention.readthedocs.io/runbooks/privacy-budget"
+          
+      # Warning: Privacy budget getting low
+      - alert: PrivacyBudgetWarning
+        expr: dp_privacy_budget_remaining < 0.3
+        for: 5m
+        labels:
+          severity: warning
+          service: dp-flash-attention
+          alert_type: privacy
+        annotations:
+          summary: "Privacy budget getting low"
+          description: "Privacy budget remaining is {{ $value }}, consider reducing usage"
+          
+      # Critical: Privacy budget exceeded
+      - alert: PrivacyBudgetExceeded
+        expr: dp_privacy_budget_spent > dp_privacy_budget_allocated
+        for: 0s
+        labels:
+          severity: critical
+          service: dp-flash-attention
+          alert_type: privacy_violation
+        annotations:
+          summary: "Privacy budget exceeded - IMMEDIATE ACTION REQUIRED"
+          description: "Privacy budget spent ({{ $value }}) exceeds allocated budget"
+          
+      # Critical: Invalid privacy parameters
+      - alert: InvalidPrivacyParameters
+        expr: dp_privacy_epsilon <= 0 or dp_privacy_delta <= 0
+        for: 0s
+        labels:
+          severity: critical
+          service: dp-flash-attention
+          alert_type: security
+        annotations:
+          summary: "Invalid privacy parameters detected"
+          description: "Privacy parameters are invalid: epsilon={{ $labels.epsilon }}, delta={{ $labels.delta }}"
+
+  - name: performance_alerts
+    rules:
+      # High latency in attention computation
+      - alert: AttentionLatencyHigh
+        expr: histogram_quantile(0.95, dp_flash_attention_latency_seconds) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          service: dp-flash-attention
+          alert_type: performance
+        annotations:
+          summary: "High attention computation latency"
+          description: "95th percentile latency is {{ $value }}s, above 100ms threshold"
+          
+      # GPU memory usage high
+      - alert: GPUMemoryHigh
+        expr: nvidia_gpu_memory_used_bytes / nvidia_gpu_memory_total_bytes > 0.9
+        for: 2m
+        labels:
+          severity: warning 
+          service: dp-flash-attention
+          alert_type: resource
+        annotations:
+          summary: "GPU memory usage high"
+          description: "GPU memory usage is {{ $value | humanizePercentage }}"
+          
+      # CUDA errors detected
+      - alert: CUDAErrors
+        expr: increase(cuda_errors_total[5m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+          service: dp-flash-attention
+          alert_type: cuda
+        annotations:
+          summary: "CUDA errors detected"
+          description: "{{ $value }} CUDA errors in the last 5 minutes"
+
+  - name: security_alerts
+    rules:
+      # Potential privacy leak in logs
+      - alert: PrivacyLeakDetected
+        expr: increase(privacy_leak_attempts_total[1m]) > 0
+        for: 0s
+        labels:
+          severity: critical
+          service: dp-flash-attention
+          alert_type: security
+        annotations:
+          summary: "Potential privacy leak detected"
+          description: "Privacy leak attempt detected in application logs"
+          
+      # Unauthorized access attempts
+      - alert: UnauthorizedAccess
+        expr: increase(http_requests_total{code=~"401|403"}[5m]) > 10
+        for: 1m
+        labels:
+          severity: warning
+          service: dp-flash-attention
+          alert_type: security
+        annotations:
+          summary: "Multiple unauthorized access attempts"
+          description: "{{ $value }} unauthorized access attempts in 5 minutes"
+          
+      # Gradient clipping anomalies
+      - alert: GradientClippingAnomaly
+        expr: dp_gradient_norm_before_clipping > dp_gradient_clip_threshold * 5
+        for: 2m
+        labels:
+          severity: warning
+          service: dp-flash-attention
+          alert_type: privacy
+        annotations:
+          summary: "Unusual gradient norms detected"
+          description: "Gradient norm {{ $value }} is unusually high before clipping"
+
+  - name: operational_alerts
+    rules:
+      # Service down
+      - alert: ServiceDown
+        expr: up{job="dp-flash-attention"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: dp-flash-attention
+          alert_type: availability
+        annotations:
+          summary: "DP-Flash-Attention service is down"
+          description: "Service has been down for more than 1 minute"
+          
+      # High error rate
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{code=~"5.."}[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+          service: dp-flash-attention
+          alert_type: errors
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value | humanizePercentage }} over 5 minutes"
+          
+      # Disk space low
+      - alert: DiskSpaceLow
+        expr: (node_filesystem_avail_bytes / node_filesystem_size_bytes) < 0.1
+        for: 5m
+        labels:
+          severity: warning
+          service: dp-flash-attention
+          alert_type: resource
+        annotations:
+          summary: "Disk space running low"
+          description: "Disk space is {{ $value | humanizePercentage }} full"

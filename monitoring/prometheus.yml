@@ -1,0 +1,97 @@
+# Prometheus configuration for DP-Flash-Attention monitoring
+# Focuses on privacy-preserving ML metrics and performance monitoring
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'dp-flash-attention'
+    environment: 'production'
+
+rule_files:
+  - "rules/*.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+scrape_configs:
+  # Application metrics
+  - job_name: 'dp-flash-attention'
+    static_configs:
+      - targets: ['localhost:8000']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+    scrape_timeout: 5s
+    
+    # Privacy-specific metric collection
+    metric_relabel_configs:
+      # Relabel privacy budget metrics
+      - source_labels: [__name__]
+        regex: 'dp_privacy_budget.*'
+        target_label: 'metric_type'
+        replacement: 'privacy'
+      
+      # Relabel performance metrics
+      - source_labels: [__name__]
+        regex: 'dp_flash_attention_latency.*'
+        target_label: 'metric_type'
+        replacement: 'performance'
+      
+      # Drop sensitive debug metrics in production
+      - source_labels: [__name__]
+        regex: 'debug_.*|test_.*'
+        action: drop
+
+  # CUDA GPU metrics
+  - job_name: 'nvidia-gpu'
+    static_configs:
+      - targets: ['localhost:9445']
+    scrape_interval: 30s
+    
+  # System metrics
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['localhost:9100']
+    scrape_interval: 30s
+    
+  # Python application metrics
+  - job_name: 'python-metrics'
+    static_configs:
+      - targets: ['localhost:8001']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+
+  # Privacy accounting service
+  - job_name: 'privacy-accountant'
+    static_configs:
+      - targets: ['localhost:8002']
+    metrics_path: '/privacy/metrics'
+    scrape_interval: 5s
+    
+    # Special handling for privacy metrics
+    honor_labels: true
+    metric_relabel_configs:
+      # Ensure privacy metrics are properly labeled
+      - source_labels: [__name__]
+        regex: 'privacy_.*'
+        target_label: 'service'
+        replacement: 'privacy-accountant'
+
+# Remote write configuration for long-term storage
+remote_write:
+  - url: "http://cortex:9009/api/prom/remote/write"
+    queue_config:
+      max_samples_per_send: 1000
+      batch_send_deadline: 5s
+      min_shards: 1
+      max_shards: 10
+    
+    # Write privacy metrics to secure storage
+    write_relabel_configs:
+      - source_labels: [metric_type]
+        regex: 'privacy'
+        target_label: '__tmp_privacy'
+        replacement: 'true'
