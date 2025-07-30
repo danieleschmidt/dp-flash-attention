@@ -1,0 +1,205 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "DP-Flash-Attention Privacy Dashboard",
+    "tags": ["differential-privacy", "privacy", "ml"],
+    "style": "dark",
+    "timezone": "browser",
+    "refresh": "10s",
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "panels": [
+      {
+        "id": 1,
+        "title": "Privacy Budget Overview",
+        "type": "stat",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+        "targets": [
+          {
+            "expr": "dp_privacy_budget_remaining",
+            "refId": "A",
+            "legendFormat": "Budget Remaining"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "min": 0,
+            "max": 1,
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 0.3},
+                {"color": "green", "value": 0.7}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 2,
+        "title": "Privacy Budget Consumption Rate",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+        "targets": [
+          {
+            "expr": "rate(dp_privacy_budget_spent[5m])",
+            "refId": "A",
+            "legendFormat": "Budget Consumption Rate"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Budget per second",
+            "min": 0
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Epsilon Values by Layer",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 8},
+        "targets": [
+          {
+            "expr": "dp_privacy_epsilon",
+            "refId": "A",
+            "legendFormat": "Layer {{layer}}"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Epsilon",
+            "min": 0,
+            "logBase": 10
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Gradient Clipping Statistics",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, dp_gradient_norm_before_clipping)",
+            "refId": "A",
+            "legendFormat": "95th percentile"
+          },
+          {
+            "expr": "histogram_quantile(0.5, dp_gradient_norm_before_clipping)",
+            "refId": "B",
+            "legendFormat": "Median"
+          },
+          {
+            "expr": "dp_gradient_clip_threshold",
+            "refId": "C",
+            "legendFormat": "Clip Threshold"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Noise Injection Metrics",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+        "targets": [
+          {
+            "expr": "dp_noise_scale",
+            "refId": "A",
+            "legendFormat": "Noise Scale"
+          },
+          {
+            "expr": "rate(dp_noise_samples_total[5m])",
+            "refId": "B",
+            "legendFormat": "Noise Samples/sec"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Privacy Violations",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 8, "x": 0, "y": 24},
+        "targets": [
+          {
+            "expr": "sum(increase(privacy_violations_total[1h]))",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": 0},
+                {"color": "red", "value": 1}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 7,
+        "title": "Model Performance vs Privacy",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 16, "x": 8, "y": 24},
+        "targets": [
+          {
+            "expr": "model_accuracy",
+            "refId": "A",
+            "legendFormat": "Model Accuracy",
+            "yAxis": 1
+          },
+          {
+            "expr": "dp_privacy_budget_spent",
+            "refId": "B",
+            "legendFormat": "Privacy Spent",
+            "yAxis": 2
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Accuracy",
+            "min": 0,
+            "max": 1,
+            "position": "left"
+          },
+          {
+            "label": "Privacy Budget",
+            "min": 0,
+            "position": "right"
+          }
+        ]
+      }
+    ],
+    "templating": {
+      "list": [
+        {
+          "name": "instance",
+          "type": "query",
+          "query": "label_values(up, instance)",
+          "refresh": 1
+        },
+        {
+          "name": "model",
+          "type": "query", 
+          "query": "label_values(dp_privacy_epsilon, model)",
+          "refresh": 1
+        }
+      ]
+    },
+    "annotations": {
+      "list": [
+        {
+          "name": "Privacy Budget Alerts",
+          "datasource": "Prometheus",
+          "expr": "ALERTS{alertname=~\"PrivacyBudget.*\"}",
+          "iconColor": "red"
+        }
+      ]
+    }
+  }
+}
