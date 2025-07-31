@@ -1,0 +1,127 @@
+# Observability Configuration for DP-Flash-Attention
+# Comprehensive monitoring, logging, and alerting setup
+
+version: '3.8'
+
+services:
+  # Privacy Metrics Collector
+  privacy-metrics:
+    build:
+      context: .
+      dockerfile: monitoring/Dockerfile.metrics
+    environment:
+      - PRIVACY_BUDGET_THRESHOLD=0.8
+      - ALERT_ENDPOINT=http://alertmanager:9093
+      - METRICS_INTERVAL=30s
+    volumes:
+      - ./logs:/app/logs
+      - ./metrics:/app/metrics
+    networks:
+      - monitoring
+    restart: unless-stopped
+    
+  # Performance Monitor
+  perf-monitor:
+    image: prom/node-exporter:latest
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)'
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    networks:
+      - monitoring
+    restart: unless-stopped
+    
+  # CUDA Metrics Exporter
+  nvidia-exporter:
+    image: mindprince/nvidia_gpu_prometheus_exporter:0.1
+    volumes:
+      - /usr/lib/x86_64-linux-gnu/libnvidia-ml.so:/usr/lib/x86_64-linux-gnu/libnvidia-ml.so:ro
+      - /usr/lib/x86_64-linux-gnu/libnvidia-ml.so.1:/usr/lib/x86_64-linux-gnu/libnvidia-ml.so.1:ro
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    runtime: nvidia
+    networks:
+      - monitoring
+    restart: unless-stopped
+    
+  # Log Aggregator
+  loki:
+    image: grafana/loki:2.9.0
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./monitoring/loki-config.yml:/etc/loki/local-config.yaml
+      - loki-data:/loki
+    networks:
+      - monitoring
+    restart: unless-stopped
+    
+  # Log Shipper
+  promtail:
+    image: grafana/promtail:2.9.0
+    volumes:
+      - ./logs:/var/log
+      - ./monitoring/promtail-config.yml:/etc/promtail/config.yml
+    command: -config.file=/etc/promtail/config.yml
+    networks:
+      - monitoring
+    restart: unless-stopped
+    
+  # Privacy Audit Logger
+  audit-logger:
+    build:
+      context: .
+      dockerfile: monitoring/Dockerfile.audit
+    environment:
+      - LOG_LEVEL=INFO
+      - PRIVACY_LOG_RETENTION=90d
+      - COMPLIANCE_MODE=SOC2
+    volumes:
+      - ./logs/audit:/app/logs
+      - ./audit:/app/audit
+    networks:
+      - monitoring
+    restart: unless-stopped
+    
+  # Alert Manager
+  alertmanager:
+    image: prom/alertmanager:latest
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./monitoring/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+      - alertmanager-data:/alertmanager
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+      - '--web.external-url=http://localhost:9093'
+      - '--cluster.listen-address='
+    networks:
+      - monitoring
+    restart: unless-stopped
+
+  # Jaeger for Distributed Tracing
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "16686:16686"
+      - "14268:14268"
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    networks:
+      - monitoring
+    restart: unless-stopped
+
+volumes:
+  loki-data:
+  alertmanager-data:
+
+networks:
+  monitoring:
+    driver: bridge
