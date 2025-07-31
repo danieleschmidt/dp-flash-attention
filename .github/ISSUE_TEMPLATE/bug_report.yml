@@ -1,150 +1,135 @@
 name: 🐛 Bug Report
-description: Report a bug or unexpected behavior in DP-Flash-Attention
-title: "[Bug]: "
-labels: ["bug", "triage"]
+description: Report a bug or unexpected behavior
+title: "[BUG] "
+labels: ["bug", "needs-triage"]
 assignees: []
+
 body:
   - type: markdown
     attributes:
       value: |
         Thanks for taking the time to report a bug! Please fill out this form as completely as possible.
+        
+        **⚠️ Security Notice**: If this bug relates to privacy guarantees or security vulnerabilities, 
+        please email security@dp-flash-attention.org instead of filing a public issue.
 
   - type: checkboxes
-    id: checklist
+    id: security-check
     attributes:
-      label: Pre-flight Checklist
-      description: Please confirm you have completed the following
+      label: Security Confirmation
+      description: Please confirm this is not a security or privacy issue
       options:
-        - label: I have searched existing issues to ensure this is not a duplicate
+        - label: This bug does not involve privacy guarantee violations or security vulnerabilities
           required: true
-        - label: I have read the [Contributing Guidelines](https://github.com/yourusername/dp-flash-attention/blob/main/CONTRIBUTING.md)
-          required: true
-        - label: I have verified this issue exists in the latest version
-          required: true
-
-  - type: dropdown
-    id: bug-type
-    attributes:
-      label: Bug Type
-      description: What type of bug is this?
-      options:
-        - Privacy Guarantee Violation
-        - Performance Issue
-        - CUDA/GPU Error
-        - Installation Problem
-        - Documentation Issue
-        - API/Interface Bug
-        - Other
-    validations:
-      required: true
 
   - type: textarea
-    id: description
+    id: bug-description
     attributes:
       label: Bug Description
       description: A clear and concise description of what the bug is
-      placeholder: Describe the bug...
+      placeholder: "What happened?"
     validations:
       required: true
 
   - type: textarea
-    id: reproduction
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+      placeholder: "What should have happened instead?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction-steps
     attributes:
       label: Steps to Reproduce
-      description: Detailed steps to reproduce the behavior
+      description: Provide detailed steps to reproduce the bug
       placeholder: |
         1. Import dp_flash_attention
         2. Create DPFlashAttention with parameters...
-        3. Run forward pass with input...
+        3. Call method...
         4. See error
     validations:
       required: true
 
   - type: textarea
-    id: expected
-    attributes:
-      label: Expected Behavior
-      description: What you expected to happen
-      placeholder: Describe what should have happened...
-    validations:
-      required: true
-
-  - type: textarea
-    id: actual
-    attributes:
-      label: Actual Behavior
-      description: What actually happened
-      placeholder: Describe what actually happened...
-    validations:
-      required: true
-
-  - type: textarea
-    id: code
+    id: minimal-example
     attributes:
       label: Minimal Code Example
-      description: Minimal code that reproduces the issue
+      description: Please provide a minimal, complete, and verifiable example
       render: python
       placeholder: |
         import torch
         from dp_flash_attention import DPFlashAttention
         
-        # Your minimal reproduction code here
-    validations:
-      required: false
+        # Your minimal example here
 
   - type: textarea
-    id: error
+    id: error-output
     attributes:
       label: Error Output
-      description: Full error traceback (if applicable)
+      description: Full error traceback or unexpected output
       render: text
-      placeholder: Paste the full error traceback here...
+      placeholder: "Paste the complete error message here"
+
+  - type: dropdown
+    id: bug-category
+    attributes:
+      label: Bug Category
+      description: What category does this bug fall into?
+      options:
+        - Privacy/DP mechanism
+        - CUDA kernel
+        - Performance
+        - Memory usage
+        - Installation/Setup
+        - Documentation
+        - Testing
+        - Other
     validations:
-      required: false
+      required: true
+
+  - type: input
+    id: privacy-params
+    attributes:
+      label: Privacy Parameters (if applicable)
+      description: "epsilon, delta, clip_norm values used"
+      placeholder: "epsilon=1.0, delta=1e-5, clip_norm=1.0"
 
   - type: textarea
     id: environment
     attributes:
       label: Environment Information
-      description: |
-        Please run: `python -c "import sys, torch, dp_flash_attention; print(f'Python: {sys.version}'); print(f'PyTorch: {torch.__version__}'); print(f'CUDA: {torch.version.cuda}'); print(f'DP-Flash-Attention: {dp_flash_attention.__version__}')"`
-      render: text
-      placeholder: |
-        Python: 3.10.12
-        PyTorch: 2.3.0+cu121
-        CUDA: 12.1
-        DP-Flash-Attention: 0.1.0
-        OS: Ubuntu 22.04
-        GPU: NVIDIA H100 80GB
+      description: Please provide your environment details
+      value: |
+        - DP-Flash-Attention version:
+        - Python version:
+        - PyTorch version:
+        - CUDA version:
+        - GPU model:
+        - Operating System:
+        - Installation method (pip, source):
+      render: markdown
     validations:
       required: true
 
   - type: dropdown
-    id: privacy-sensitive
+    id: severity
     attributes:
-      label: Privacy Sensitivity
-      description: Does this bug potentially affect privacy guarantees?
+      label: Bug Severity
+      description: How severe is this bug?
       options:
-        - "No - This is not privacy-related"
-        - "Yes - This could affect privacy guarantees"
-        - "Unsure - Needs privacy team review"
+        - Critical (complete failure, privacy violation)
+        - High (major functionality broken)
+        - Medium (some functionality broken)
+        - Low (minor issue, workaround available)
     validations:
       required: true
 
   - type: textarea
-    id: context
+    id: additional-context
     attributes:
       label: Additional Context
-      description: Any other context about the problem
-      placeholder: Add any other context, screenshots, or relevant information...
-    validations:
-      required: false
-
-  - type: checkboxes
-    id: privacy-confirm
-    attributes:
-      label: Privacy Confirmation
-      description: For privacy-sensitive bugs
-      options:
-        - label: I confirm this report does not contain sensitive data or model weights
-        - label: I understand privacy-related bugs will be handled with additional security measures
+      description: Any other context, screenshots, or information that might be helpful
+      placeholder: "Add any other context about the problem here"

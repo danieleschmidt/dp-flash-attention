@@ -1,45 +1,48 @@
 # CODEOWNERS for DP-Flash-Attention
+# This file defines code ownership for review requirements
 # See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
 
-# Global owners - require review from maintainers for all changes
+# Global owners - these users are requested for review on all PRs
 * @danieleschmidt
 
-# Core library code requires privacy experts
-/src/dp_flash_attention/ @danieleschmidt
-/src/dp_flash_attention/core/ @danieleschmidt
-/src/dp_flash_attention/privacy/ @danieleschmidt
+# Privacy-critical components require privacy expert review
+src/dp_flash_attention/privacy/ @danieleschmidt @privacy-team
+tests/privacy/ @danieleschmidt @privacy-team
+scripts/check_privacy_params.py @danieleschmidt @privacy-team
 
-# CUDA kernels require performance and security review
-/src/dp_flash_attention/kernels/ @danieleschmidt
-*.cu @danieleschmidt
-*.cuh @danieleschmidt
+# CUDA kernel implementations require systems expert review  
+src/dp_flash_attention/kernels/ @danieleschmidt @cuda-team
+scripts/cuda_security_check.py @danieleschmidt @cuda-team
 
-# Privacy-critical tests require additional scrutiny
-/tests/privacy/ @danieleschmidt
-/tests/integration/ @danieleschmidt
+# Security-related files require security team review
+SECURITY.md @danieleschmidt @security-team
+.github/workflows/security.yml @danieleschmidt @security-team
+.pre-commit-config.yaml @danieleschmidt @security-team
 
-# Documentation updates
-/docs/ @danieleschmidt
-README.md @danieleschmidt
-CONTRIBUTING.md @danieleschmidt
-SECURITY.md @danieleschmidt
+# Infrastructure and CI/CD
+.github/workflows/ @danieleschmidt @devops-team
+Dockerfile @danieleschmidt @devops-team
+docker-compose.yml @danieleschmidt @devops-team
+.devcontainer/ @danieleschmidt @devops-team
 
-# Build and CI configuration
+# Documentation requires doc team review
+docs/ @danieleschmidt @docs-team
+README.md @danieleschmidt @docs-team
+CONTRIBUTING.md @danieleschmidt @docs-team
+
+# Build and packaging
 pyproject.toml @danieleschmidt
+setup.py @danieleschmidt
 Makefile @danieleschmidt
-.github/ @danieleschmidt
-.pre-commit-config.yaml @danieleschmidt
 
-# Security-sensitive files require security team review
-SECURITY.md @danieleschmidt
-.github/workflows/security.yml @danieleschmidt
-scripts/security_*.py @danieleschmidt
+# Monitoring and observability  
+monitoring/ @danieleschmidt @sre-team
+docs/monitoring/ @danieleschmidt @sre-team
+
+# Compliance and governance
+docs/compliance/ @danieleschmidt @compliance-team
+LICENSE @danieleschmidt @legal-team
 
 # Release management
-CHANGELOG.md @danieleschmidt
-requirements*.txt @danieleschmidt
-
-# Development environment
-.devcontainer/ @danieleschmidt
-Dockerfile* @danieleschmidt
-docker-compose*.yml @danieleschmidt
+CHANGELOG.md @danieleschmidt @release-team
+.github/workflows/release.yml @danieleschmidt @release-team

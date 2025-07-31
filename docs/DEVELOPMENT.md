@@ -1,414 +1,226 @@
-# Development Guide
+# Development Environment Setup
 
-This guide covers the development workflow, tools, and best practices for contributing to DP-Flash-Attention.
+This guide provides comprehensive instructions for setting up a development environment for DP-Flash-Attention, including CUDA requirements, privacy validation tools, and enterprise development practices.
 
-## 🚀 Quick Start
-
-### Prerequisites
-
-- **Python 3.10+** with development headers
-- **NVIDIA GPU** with CUDA 12.0+ (recommended)
-- **Git** for version control
-- **Docker** (optional, for containerized development)
-
-### Development Setup
-
-#### Option 1: Local Development
+## 🎯 Quick Start
 
 ```bash
-# Clone repository
+# Clone and setup
 git clone https://github.com/yourusername/dp-flash-attention.git
 cd dp-flash-attention
-
-# Run automated setup
 ./scripts/setup_dev.sh
 
-# Verify installation
-make test
+# Activate environment and run tests
+source venv/bin/activate  # or conda activate dp-flash-attention
+make test-all
 ```
 
-#### Option 2: Dev Container (Recommended)
+## 📋 Prerequisites
 
+### System Requirements
+- **Python**: 3.10+ (3.11 recommended for development)
+- **CUDA**: 12.0+ with compute capability 7.0+ GPU
+- **RAM**: 16GB minimum, 32GB recommended
+- **Storage**: 10GB free space for dependencies and models
+
+### Hardware Recommendations
+- **GPU**: NVIDIA H100, A100, RTX 4090, or RTX 4080
+- **CPU**: Multi-core processor (8+ cores recommended)
+- **Storage**: NVMe SSD for faster builds
+
+## 🐳 Development Environment Options
+
+### Option 1: Docker Development (Recommended)
 ```bash
-# Open in VS Code with Dev Containers extension
-code .
-# VS Code will prompt to reopen in container
+# Use development container
+docker-compose -f docker-compose.dev.yml up -d
+docker exec -it dp-flash-attention-dev bash
 
-# Or manually with Docker
-docker build -f .devcontainer/Dockerfile -t dp-flash-dev .
-docker run --gpus all -it -v $(pwd):/workspaces/dp-flash-attention dp-flash-dev
+# Or use VSCode Dev Containers
+code --folder-uri vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/yourusername/dp-flash-attention
 ```
 
-#### Option 3: Manual Setup
+### Option 2: Conda Environment
+```bash
+# Create environment from environment.yml
+conda env create -f environment.yml
+conda activate dp-flash-attention
 
+# Install development dependencies
+pip install -e ".[dev,test,docs,cuda]"
+```
+
+### Option 3: Python venv
 ```bash
 # Create virtual environment
-python3.10 -m venv venv
-source venv/bin/activate
+python -m venv venv
+source venv/bin/activate  # Linux/macOS
+# venv\Scripts\activate  # Windows
 
-# Install in development mode
+# Install with development dependencies
 pip install -e ".[dev,test,docs,cuda]"
-
-# Set up pre-commit hooks
-pre-commit install
 ```
 
-## 🛠️ Development Tools
+## 🛠️ Development Tools Setup
 
-### Code Quality
-
-- **Black**: Code formatting (`make format`)
-- **Ruff**: Fast linting and import sorting (`make lint`)
-- **MyPy**: Static type checking (`make lint`)
-- **Pre-commit**: Automated quality checks on commit
-
-### Testing
-
-- **Pytest**: Test framework with multiple categories
-- **Coverage**: Code coverage reporting with pytest-cov
-- **Benchmark**: Performance testing with pytest-benchmark
-- **Hypothesis**: Property-based testing for edge cases
-
-### Documentation
-
-- **Sphinx**: Documentation generation (`make docs`)
-- **MyST**: Markdown support in Sphinx
-- **ReadTheDocs**: Hosted documentation
-- **Jupyter**: Interactive examples and tutorials
-
-## 🧪 Testing Strategy
-
-### Test Categories
-
+### Essential Tools Installation
 ```bash
-# Unit tests - fast, isolated components
+# Install development tools
+pip install -e ".[dev]"
+
+# Setup pre-commit hooks
+pre-commit install
+pre-commit install --hook-type commit-msg
+
+# Install additional development utilities
+pip install jupyterlab pytest-xdist pytest-benchmark
+```
+
+### IDE Configuration
+
+#### VS Code Setup
+Install recommended extensions:
+- Python Extension Pack
+- Python Docstring Generator
+- CUDA support extensions
+- GitLens for enhanced Git integration
+
+#### PyCharm Configuration
+1. Import project and configure Python interpreter
+2. Enable pytest as test runner
+3. Configure CUDA debugging if using PyCharm Professional
+4. Setup code style to match Black formatting
+
+## 🧪 Testing Framework
+
+### Running Tests
+```bash
+# Quick test suite
 make test
 
-# Integration tests - component interactions  
-make test-integration
-
-# Privacy tests - differential privacy guarantees
-make test-privacy
-
-# GPU tests - CUDA functionality (requires GPU)
+# Full test suite including GPU tests
 make test-gpu
+
+# Privacy-specific tests
+make test-privacy
 
 # Performance benchmarks
 make benchmark
 
-# All tests
-make test-all
+# Test with coverage
+make test-cov
 ```
 
-### Writing Tests
+### Test Categories
+- **Unit Tests**: Fast, isolated component testing
+- **Integration Tests**: End-to-end workflow validation
+- **Privacy Tests**: Differential privacy guarantee verification
+- **GPU Tests**: CUDA kernel validation (requires GPU)
+- **Performance Tests**: Benchmark and regression testing
 
-#### Unit Test Example
+## 🔒 Privacy Development Guidelines
 
+### Privacy Parameter Validation
+Always validate privacy parameters in development:
 ```python
-# tests/unit/test_privacy.py
-import pytest
-from dp_flash_attention.privacy import RenyiAccountant
+# Use privacy validation utilities
+from dp_flash_attention.privacy import validate_privacy_params
 
-class TestRenyiAccountant:
-    def test_initialization(self):
-        accountant = RenyiAccountant()
-        assert len(accountant.alpha_values) > 0
-        
-    @pytest.mark.parametrize("epsilon,delta", [
-        (1.0, 1e-5),
-        (0.5, 1e-6)  
-    ])
-    def test_privacy_composition(self, epsilon, delta):
-        accountant = RenyiAccountant()
-        accountant.add_step(epsilon, delta, sampling_rate=0.01)
-        total_eps = accountant.get_epsilon(delta)
-        assert total_eps >= epsilon
+def validate_dp_config(epsilon, delta, sensitivity):
+    """Validate privacy configuration."""
+    assert epsilon > 0, "Epsilon must be positive"
+    assert 0 < delta < 1, "Delta must be in (0, 1)"
+    assert sensitivity > 0, "Sensitivity must be positive"
+    
+    return validate_privacy_params(epsilon, delta, sensitivity)
 ```
 
-#### Privacy Test Example
-
+### Testing Privacy Guarantees
 ```python
-# tests/privacy/test_guarantees.py
-@pytest.mark.slow
-def test_membership_inference_resistance():
-    """Test that DP attention resists membership inference."""
-    # Implementation of empirical privacy test
-    dp_attn = DPFlashAttention(embed_dim=768, num_heads=12, 
-                               epsilon=1.0, delta=1e-5)
+# Privacy tests should verify theoretical guarantees
+def test_privacy_composition():
+    """Test privacy budget composition."""
+    accountant = RenyiAccountant()
     
-    # Train shadow models and run membership inference
-    privacy_violation_rate = run_membership_inference_attack(dp_attn)
-    assert privacy_violation_rate < 0.1  # Less than 10% violation rate
-```
-
-#### GPU Test Example
-
-```python
-# tests/gpu/test_cuda_kernels.py
-@pytest.mark.gpu
-def test_cuda_kernel_correctness():
-    """Test CUDA kernel produces correct results."""
-    if not torch.cuda.is_available():
-        pytest.skip("CUDA not available")
-        
-    # Compare GPU vs CPU results
-    input_tensor = torch.randn(32, 512, 768)
+    # Multiple privacy steps
+    for _ in range(10):
+        accountant.add_step(epsilon=0.1, delta=1e-6, sampling_rate=0.01)
     
-    cpu_result = dp_attention_cpu(input_tensor)
-    gpu_result = dp_attention_gpu(input_tensor.cuda())
-    
-    assert torch.allclose(cpu_result, gpu_result.cpu(), atol=1e-4)
+    total_epsilon = accountant.get_epsilon(delta=1e-5)
+    assert total_epsilon < 2.0, "Privacy budget exceeded"
 ```
 
-### Test Markers
+## 🚀 Development Workflow
 
-Use pytest markers to categorize tests:
-
-- `@pytest.mark.slow`: Tests that take >5 seconds
-- `@pytest.mark.gpu`: Tests requiring CUDA hardware
-- `@pytest.mark.privacy`: Privacy-related tests
-- `@pytest.mark.benchmark`: Performance benchmarks
-- `@pytest.mark.integration`: Cross-component tests
-
-## 🏗️ Project Structure
-
-```
-dp-flash-attention/
-├── src/dp_flash_attention/       # Main package
-│   ├── core/                     # Core DP attention implementations
-│   ├── kernels/                  # CUDA kernel code
-│   ├── privacy/                  # Privacy accounting and mechanisms
-│   ├── utils/                    # Utility functions
-│   └── integrations/             # Framework integrations
-├── tests/                        # Test suites
-│   ├── unit/                     # Unit tests
-│   ├── integration/              # Integration tests
-│   ├── privacy/                  # Privacy-specific tests
-│   ├── benchmarks/               # Performance benchmarks
-│   └── gpu/                      # GPU-specific tests
-├── docs/                         # Documentation
-│   ├── source/                   # Sphinx source files
-│   ├── workflows/                # GitHub Actions documentation
-│   └── examples/                 # Usage examples
-├── scripts/                      # Development scripts
-├── .devcontainer/                # Development container config
-└── notebooks/                    # Jupyter notebooks
-```
-
-## 🔧 Development Workflow
-
-### Feature Development
-
-1. **Create feature branch**
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-
-2. **Implement feature with tests**
-   ```bash
-   # Write code in src/
-   # Write tests in tests/ 
-   # Update documentation
-   ```
-
-3. **Run quality checks**
-   ```bash
-   make lint
-   make test
-   make test-privacy  # For privacy-related features
-   ```
-
-4. **Submit pull request**
-   - Use the provided PR template
-   - Include privacy impact assessment
-   - Add performance benchmarks if applicable
-
-### Privacy-Critical Changes
-
-Privacy-related changes require additional validation:
-
-1. **Theoretical analysis** of privacy guarantees
-2. **Formal verification** where possible  
-3. **Empirical testing** with membership inference
-4. **Expert review** from privacy team
-5. **Documentation** of privacy implications
-
-### CUDA Kernel Development
-
-For CUDA kernel modifications:
-
-1. **Test on multiple GPU architectures** (V100, A100, H100)
-2. **Benchmark performance** vs previous implementation
-3. **Validate numerical accuracy** against CPU reference
-4. **Check memory usage** and potential leaks
-5. **Document optimization techniques** used
-
-## 📚 Documentation
-
-### Code Documentation
-
-- **Docstrings**: Use Google style for all public APIs
-- **Type hints**: Required for all function signatures
-- **Comments**: Explain complex algorithms and privacy mechanisms
-
-Example:
-```python
-def dp_flash_attn_func(
-    q: torch.Tensor,
-    k: torch.Tensor,
-    v: torch.Tensor,
-    epsilon: float,
-    delta: float,
-    causal: bool = False
-) -> torch.Tensor:
-    """
-    Differentially private Flash-Attention function.
-    
-    Args:
-        q: Query tensor of shape [batch, seq_len, num_heads, head_dim]
-        k: Key tensor of shape [batch, seq_len, num_heads, head_dim]
-        v: Value tensor of shape [batch, seq_len, num_heads, head_dim]
-        epsilon: Privacy budget parameter (ε)
-        delta: Privacy parameter (δ) 
-        causal: Whether to apply causal masking
-        
-    Returns:
-        Attention output with (ε, δ)-differential privacy guarantee
-        
-    Privacy:
-        This function provides (ε, δ)-differential privacy through
-        Gaussian noise injection calibrated to gradient sensitivity.
-    """
-```
-
-### Building Documentation
-
+### Git Workflow
 ```bash
-# Build HTML documentation
-make docs
+# Create feature branch
+git checkout -b feature/privacy-enhancement
 
-# Serve locally for preview
-make docs-serve
+# Make changes and commit
+git add .
+git commit -m "feat: add privacy budget monitoring"
 
-# Documentation will be available at http://localhost:8000
+# Run pre-commit checks
+pre-commit run --all-files
+
+# Push and create PR
+git push origin feature/privacy-enhancement
+gh pr create --title "Add privacy budget monitoring" --body "Description..."
 ```
 
-## 🔒 Security Considerations
+## 🐛 Debugging
 
-### Secure Development
-
-- **Never commit secrets** or API keys
-- **Validate all inputs** especially privacy parameters
-- **Use secure random number generation** for DP noise
-- **Follow OWASP guidelines** for secure coding
-
-### Privacy Security
-
-- **Validate privacy parameters** at runtime
-- **Implement secure composition** of privacy mechanisms  
-- **Use cryptographically secure PRNGs** for noise generation
-- **Audit privacy budget consumption** with logging
-
-### Code Review Checklist
-
-- [ ] Code follows style guidelines
-- [ ] Tests cover new functionality
-- [ ] Privacy implications documented
-- [ ] Performance impact assessed
-- [ ] Security vulnerabilities checked
-- [ ] Documentation updated
-
-## 🚀 Performance Optimization
-
-### Profiling Tools
-
-- **PyTorch Profiler**: For PyTorch-specific optimizations
-- **NVIDIA Nsight**: For CUDA kernel profiling
-- **cProfile**: For Python performance analysis
-- **Memory Profiler**: For memory usage optimization
-
-### Optimization Guidelines
-
-1. **Profile first** - measure before optimizing
-2. **Focus on hot paths** - optimize critical sections
-3. **Memory efficiency** - minimize memory allocations
-4. **CUDA best practices** - coalesced memory access, occupancy
-5. **Benchmark regularly** - prevent performance regressions
-
-### Performance Testing
-
+### General Debugging
 ```bash
-# Run benchmarks with detailed output
-pytest tests/benchmarks/ -v --benchmark-only
+# Run with verbose output
+python -m pytest tests/ -v -s
 
-# Compare against baseline
-pytest tests/benchmarks/ --benchmark-compare=baseline.json
+# Debug specific test
+python -m pytest tests/test_privacy.py::test_epsilon_validation -v -s --pdb
 
-# Profile memory usage
-python -m memory_profiler your_script.py
+# Profile performance
+python -m cProfile -s cumtime examples/benchmark.py
 ```
 
-## 🤝 Collaboration
+### CUDA Debugging
+```bash
+# Enable CUDA debugging
+export CUDA_LAUNCH_BLOCKING=1
+export TORCH_USE_CUDA_DSA=1
 
-### Communication Channels
+# Run with CUDA memory checking
+python -m torch.utils.collect_env
+python -c "import torch; print(torch.cuda.is_available())"
+```
 
-- **GitHub Issues**: Bug reports and feature requests
-- **GitHub Discussions**: General questions and ideas
-- **Pull Requests**: Code review and collaboration
-- **Security Email**: security@dp-flash-attention.org
+### Privacy Debugging
+```bash
+# Enable privacy debug logging
+export DP_DEBUG=1
+python scripts/privacy_debug.py
 
-### Code Review Process
+# Validate privacy parameters
+python -c "
+from dp_flash_attention.privacy import validate_privacy_params
+print(validate_privacy_params(epsilon=1.0, delta=1e-5, sensitivity=1.0))
+"
+```
 
-1. **Automated checks** must pass (CI/CD)
-2. **Manual review** by maintainer
-3. **Privacy review** for privacy-impacting changes
-4. **Performance review** for optimization changes
-5. **Final approval** and merge
+## 📊 Performance Optimization
 
-### Getting Help
+### Profiling
+```bash
+# Profile GPU kernels
+nsys profile --trace=cuda,osrt python examples/profile_attention.py
 
-- **Documentation**: Start with official docs
-- **Examples**: Check notebooks/ for usage examples
-- **Community**: Ask in GitHub Discussions
-- **Issues**: Report bugs with reproduction steps
+# Memory profiling
+python -m memory_profiler examples/memory_test.py
 
-## 🏆 Recognition
+# Privacy overhead analysis
+python benchmarks/privacy_overhead.py
+```
 
-We value all contributions:
+---
 
-- **Code contributions** (features, bug fixes, optimizations)
-- **Documentation** improvements and examples
-- **Testing** and quality assurance
-- **Research** and theoretical analysis
-- **Community support** and mentorship
-
-Contributors are recognized in:
-- README contributors section
-- Release notes
-- Academic paper acknowledgments
-- Conference presentations
-
-## 📈 Monitoring Progress
-
-### Development Metrics
-
-Track your contribution impact:
-
-- **Code coverage** improvements
-- **Performance** benchmark improvements
-- **Privacy** guarantee enhancements
-- **Documentation** completeness
-- **Community** engagement
-
-### Quality Gates
-
-All changes must meet:
-
-- [ ] Code coverage >90%
-- [ ] All tests passing
-- [ ] Performance within 5% of baseline
-- [ ] Documentation updated
-- [ ] Security review passed (if applicable)
-- [ ] Privacy guarantees maintained (if applicable)
-
-Happy coding! 🚀
+**Next Steps**: After setup, see [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines and code review processes.
