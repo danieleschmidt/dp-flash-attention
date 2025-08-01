@@ -1,0 +1,179 @@
+{
+  "analysis_timestamp": "2025-08-01T15:35:15.211474",
+  "repository": "dp-flash-attention",
+  "total_vulnerabilities": 17,
+  "severity_distribution": {
+    "critical": 4,
+    "high": 6,
+    "medium": 7,
+    "low": 0
+  },
+  "vulnerability_categories": {
+    "secrets": 0,
+    "network_security": 3,
+    "dangerous_functions": 0,
+    "cuda_security": 0,
+    "privacy_violations": 10,
+    "dependency_vulnerabilities": 3,
+    "container_security": 1
+  },
+  "vulnerabilities": [
+    {
+      "type": "insecure_network",
+      "severity": "medium",
+      "file": ".terragon/security-analyzer.py",
+      "line": 31,
+      "pattern": "http://(?!localhost|127\\.0\\.0\\.1)",
+      "description": "Insecure network communication detected",
+      "recommendation": "Use HTTPS and proper certificate validation"
+    },
+    {
+      "type": "insecure_network",
+      "severity": "medium",
+      "file": ".terragon/security-analyzer.py",
+      "line": 34,
+      "pattern": "http://(?!localhost|127\\.0\\.0\\.1)",
+      "description": "Insecure network communication detected",
+      "recommendation": "Use HTTPS and proper certificate validation"
+    },
+    {
+      "type": "insecure_network",
+      "severity": "medium",
+      "file": ".terragon/security-analyzer.py",
+      "line": 34,
+      "pattern": "urllib.*urlopen.*http://",
+      "description": "Insecure network communication detected",
+      "recommendation": "Use HTTPS and proper certificate validation"
+    },
+    {
+      "type": "missing_noise",
+      "severity": "critical",
+      "file": "monitoring/privacy-metrics.py",
+      "line": 0,
+      "description": "Privacy budget (epsilon) used without noise addition",
+      "recommendation": "Ensure proper noise is added when consuming privacy budget"
+    },
+    {
+      "type": "privacy_violation",
+      "severity": "high",
+      "file": "scripts/check_privacy_params.py",
+      "line": 165,
+      "description": "Potential privacy parameter leakage",
+      "recommendation": "Avoid logging or printing privacy-sensitive information"
+    },
+    {
+      "type": "privacy_violation",
+      "severity": "high",
+      "file": "scripts/check_privacy_params.py",
+      "line": 168,
+      "description": "Potential privacy parameter leakage",
+      "recommendation": "Avoid logging or printing privacy-sensitive information"
+    },
+    {
+      "type": "privacy_violation",
+      "severity": "high",
+      "file": ".terragon/security-analyzer.py",
+      "line": 49,
+      "description": "Potential privacy parameter leakage",
+      "recommendation": "Avoid logging or printing privacy-sensitive information"
+    },
+    {
+      "type": "privacy_violation",
+      "severity": "high",
+      "file": ".terragon/security-analyzer.py",
+      "line": 50,
+      "description": "Potential privacy parameter leakage",
+      "recommendation": "Avoid logging or printing privacy-sensitive information"
+    },
+    {
+      "type": "privacy_violation",
+      "severity": "high",
+      "file": ".terragon/security-analyzer.py",
+      "line": 51,
+      "description": "Potential privacy parameter leakage",
+      "recommendation": "Avoid logging or printing privacy-sensitive information"
+    },
+    {
+      "type": "privacy_violation",
+      "severity": "high",
+      "file": ".terragon/security-analyzer.py",
+      "line": 52,
+      "description": "Potential privacy parameter leakage",
+      "recommendation": "Avoid logging or printing privacy-sensitive information"
+    },
+    {
+      "type": "missing_noise",
+      "severity": "critical",
+      "file": "tests/performance/test_benchmarks.py",
+      "line": 0,
+      "description": "Privacy budget (epsilon) used without noise addition",
+      "recommendation": "Ensure proper noise is added when consuming privacy budget"
+    },
+    {
+      "type": "missing_noise",
+      "severity": "critical",
+      "file": "tests/privacy/test_privacy_guarantees.py",
+      "line": 0,
+      "description": "Privacy budget (epsilon) used without noise addition",
+      "recommendation": "Ensure proper noise is added when consuming privacy budget"
+    },
+    {
+      "type": "missing_noise",
+      "severity": "critical",
+      "file": "tests/unit/test_core.py",
+      "line": 0,
+      "description": "Privacy budget (epsilon) used without noise addition",
+      "recommendation": "Ensure proper noise is added when consuming privacy budget"
+    },
+    {
+      "type": "dependency_audit",
+      "severity": "medium",
+      "file": "requirements.txt",
+      "description": "Dependencies in requirements.txt need security audit",
+      "recommendation": "Run pip-audit or safety check on dependencies",
+      "tools": [
+        "pip-audit",
+        "safety",
+        "snyk"
+      ]
+    },
+    {
+      "type": "dependency_audit",
+      "severity": "medium",
+      "file": "requirements-dev.txt",
+      "description": "Dependencies in requirements-dev.txt need security audit",
+      "recommendation": "Run pip-audit or safety check on dependencies",
+      "tools": [
+        "pip-audit",
+        "safety",
+        "snyk"
+      ]
+    },
+    {
+      "type": "dependency_audit",
+      "severity": "medium",
+      "file": "pyproject.toml",
+      "description": "Dependencies in pyproject.toml need security audit",
+      "recommendation": "Run pip-audit or safety check on dependencies",
+      "tools": [
+        "pip-audit",
+        "safety",
+        "snyk"
+      ]
+    },
+    {
+      "type": "container_security",
+      "severity": "medium",
+      "file": "Dockerfile",
+      "description": "Not using --no-install-recommends flag",
+      "recommendation": "Follow Docker security best practices"
+    }
+  ],
+  "risk_score": 64.70588235294117,
+  "recommendations": [
+    "CRITICAL: Address code execution vulnerabilities immediately",
+    "HIGH: Fix secret exposure and privacy violations",
+    "Run automated dependency security scanning (pip-audit, safety)",
+    "Implement Docker security best practices"
+  ]
+}
