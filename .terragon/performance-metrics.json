@@ -1,0 +1,36 @@
+{
+  "analysis_timestamp": "2025-08-01T15:35:15.058508",
+  "repository": "dp-flash-attention",
+  "cuda_optimizations": {
+    "total_files": 0,
+    "opportunities": []
+  },
+  "python_optimizations": {
+    "total_files": 0,
+    "opportunities": []
+  },
+  "benchmark_analysis": {
+    "total_issues": 1,
+    "regressions": [
+      {
+        "file": "tests/benchmarks/test_performance.py",
+        "type": "hardcoded_expectations",
+        "description": "Benchmark has hardcoded performance expectations",
+        "expectations": [
+          "4",
+          "0"
+        ],
+        "recommendation": "Use dynamic baselines or tolerance ranges"
+      }
+    ]
+  },
+  "memory_analysis": {
+    "total_files": 0,
+    "opportunities": []
+  },
+  "summary": {
+    "total_optimization_opportunities": 0,
+    "high_priority_count": 0,
+    "estimated_performance_gain": "0-5%"
+  }
+}

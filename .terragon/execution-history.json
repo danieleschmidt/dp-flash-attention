@@ -1,0 +1,12 @@
+[
+  {
+    "timestamp": "2025-08-01T15:35:15.221717",
+    "item_id": "dep-requirements.txt",
+    "title": "Review dependencies in requirements.txt",
+    "category": "dependency-update",
+    "estimated_effort": 1.0,
+    "composite_score": 33.25333333333333,
+    "status": "completed",
+    "actual_duration": 0.1
+  }
+]
