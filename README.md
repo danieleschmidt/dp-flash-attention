@@ -375,7 +375,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 ```bibtex
 @article{dp_flash_attention_2025,
   title={DP-Flash-Attention: Hardware-Accelerated Differentially Private Transformers},
-  author={Your Name et al.},
+  author={Daniel Schmidt},
   journal={Privacy-Preserving Machine Learning Workshop, NeurIPS},
   year={2025}
 }
