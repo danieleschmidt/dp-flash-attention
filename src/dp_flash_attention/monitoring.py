@@ -106,11 +106,20 @@ class DPTelemetry:
         service_name: str = "dp-flash-attention",
         privacy_tracking: bool = True,
         performance_tracking: bool = True,
-        prometheus_registry: Optional[CollectorRegistry] = None
+        prometheus_registry: Optional[CollectorRegistry] = None,
+        alert_thresholds: Optional[Dict[str, float]] = None
     ):
         self.service_name = service_name
         self.privacy_tracking = privacy_tracking
         self.performance_tracking = performance_tracking
+        
+        # Alert thresholds
+        self.alert_thresholds = alert_thresholds or {
+            'max_epsilon_per_hour': 10.0,
+            'max_duration_ms': 5000.0,
+            'max_memory_mb': 8192.0,
+            'max_gpu_utilization': 0.95
+        }
         
         # Privacy budget tracking
         self.privacy_tracker = PrivacyBudgetTracker()
@@ -125,6 +134,11 @@ class DPTelemetry:
         
         # Set up logging
         self.logger = logging.getLogger(f"dp_telemetry.{service_name}")
+        self.logger.setLevel(logging.INFO)
+        
+        # Alert tracking
+        self._alerts_sent = set()
+        self._alert_lock = threading.Lock()
     
     def _init_prometheus(self, registry: Optional[CollectorRegistry]) -> None:
         """Initialize Prometheus metrics."""
@@ -226,6 +240,9 @@ class DPTelemetry:
         finally:
             if span:
                 span.end()
+            
+            # Check for alerts
+            self._check_privacy_alerts(epsilon, delta, operation_type)
     
     def record_performance_metrics(
         self,
@@ -267,6 +284,9 @@ class DPTelemetry:
         
         if hasattr(self, 'gpu_memory_usage') and memory_used_mb > 0:
             self.gpu_memory_usage.labels(gpu_id="0").set(memory_used_mb * 1024 * 1024)
+        
+        # Check for performance alerts
+        self._check_performance_alerts(metrics)
     
     def _get_batch_size_bucket(self, batch_size: int) -> str:
         """Get batch size bucket for metrics."""
@@ -423,3 +443,66 @@ def get_monitoring_status() -> Dict[str, Any]:
     })
     
     return status
+
+
+    def _check_privacy_alerts(self, epsilon: float, delta: float, operation_type: str) -> None:
+        """Check for privacy-related alerts."""
+        with self._alert_lock:
+            # Check epsilon consumption rate
+            current_time = time.time()
+            recent_ops = [op for op in self.privacy_tracker.get_operation_history()
+                         if current_time - op.timestamp < 3600]  # Last hour
+            
+            hourly_epsilon = sum(op.epsilon for op in recent_ops)
+            
+            if hourly_epsilon > self.alert_thresholds['max_epsilon_per_hour']:
+                alert_key = f"high_epsilon_consumption_{int(current_time // 3600)}"
+                if alert_key not in self._alerts_sent:
+                    self.logger.warning(
+                        f"High epsilon consumption detected: {hourly_epsilon:.2f} "
+                        f"in last hour (threshold: {self.alert_thresholds['max_epsilon_per_hour']})"
+                    )
+                    self._alerts_sent.add(alert_key)
+            
+            # Check for potentially weak privacy parameters
+            if epsilon > 5.0:
+                alert_key = f"weak_privacy_{operation_type}"
+                if alert_key not in self._alerts_sent:
+                    self.logger.warning(
+                        f"Weak privacy parameter detected: epsilon={epsilon} "
+                        f"in {operation_type} operation"
+                    )
+                    self._alerts_sent.add(alert_key)
+
+    def _check_performance_alerts(self, metrics: PerformanceMetrics) -> None:
+        """Check for performance-related alerts."""
+        with self._alert_lock:
+            # Check duration
+            if metrics.duration_ms > self.alert_thresholds['max_duration_ms']:
+                alert_key = f"slow_operation_{int(time.time() // 300)}"  # Every 5 minutes
+                if alert_key not in self._alerts_sent:
+                    self.logger.warning(
+                        f"Slow operation detected: {metrics.duration_ms:.1f}ms "
+                        f"(threshold: {self.alert_thresholds['max_duration_ms']}ms)"
+                    )
+                    self._alerts_sent.add(alert_key)
+            
+            # Check memory usage
+            if metrics.memory_used_mb > self.alert_thresholds['max_memory_mb']:
+                alert_key = f"high_memory_{int(time.time() // 300)}"
+                if alert_key not in self._alerts_sent:
+                    self.logger.warning(
+                        f"High memory usage detected: {metrics.memory_used_mb:.1f}MB "
+                        f"(threshold: {self.alert_thresholds['max_memory_mb']}MB)"
+                    )
+                    self._alerts_sent.add(alert_key)
+            
+            # Check GPU utilization
+            if metrics.gpu_utilization > self.alert_thresholds['max_gpu_utilization']:
+                alert_key = f"high_gpu_util_{int(time.time() // 300)}"
+                if alert_key not in self._alerts_sent:
+                    self.logger.warning(
+                        f"High GPU utilization detected: {metrics.gpu_utilization:.1%} "
+                        f"(threshold: {self.alert_thresholds['max_gpu_utilization']:.1%})"
+                    )
+                    self._alerts_sent.add(alert_key)

@@ -1,0 +1,314 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dp-flash-attention
+  labels:
+    name: dp-flash-attention
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dp-flash-config
+  namespace: dp-flash-attention
+data:
+  production.json: |
+    {
+      "privacy": {
+        "epsilon": 1.0,
+        "delta": 1e-5,
+        "max_grad_norm": 1.0,
+        "noise_mechanism": "gaussian",
+        "secure_rng": true
+      },
+      "attention": {
+        "embed_dim": 768,
+        "num_heads": 12,
+        "dropout": 0.0,
+        "bias": true,
+        "batch_first": true
+      },
+      "performance": {
+        "use_flash_attention": true,
+        "use_checkpointing": false,
+        "max_sequence_length": 16384,
+        "memory_efficient": true
+      },
+      "monitoring": {
+        "enable_privacy_tracking": true,
+        "enable_performance_tracking": true,
+        "enable_prometheus": true,
+        "log_level": "INFO"
+      },
+      "security": {
+        "validate_inputs": true,
+        "use_secure_rng": true,
+        "enable_privacy_audit": true,
+        "strict_mode": false
+      },
+      "device": "cuda",
+      "dtype": "float16"
+    }
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: dp-flash-secrets
+  namespace: dp-flash-attention
+type: Opaque
+data:
+  # Base64 encoded secrets (replace with actual values)
+  api-key: YWRtaW4=  # 'admin' in base64
+  db-password: cGFzc3dvcmQ=  # 'password' in base64
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dp-flash-attention
+  namespace: dp-flash-attention
+  labels:
+    app: dp-flash-attention
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: dp-flash-attention
+  template:
+    metadata:
+      labels:
+        app: dp-flash-attention
+    spec:
+      containers:
+      - name: dp-flash-attention
+        image: dp-flash-attention:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+          name: http
+        - containerPort: 8001
+          name: metrics
+        env:
+        - name: DP_FLASH_EPSILON
+          value: "1.0"
+        - name: DP_FLASH_DELTA
+          value: "1e-5"
+        - name: DP_FLASH_DEVICE
+          value: "cuda"
+        - name: DP_FLASH_LOG_LEVEL
+          value: "INFO"
+        - name: ENABLE_MONITORING
+          value: "true"
+        - name: ENABLE_AUTOSCALING
+          value: "true"
+        - name: MAX_WORKERS
+          value: "4"
+        volumeMounts:
+        - name: config-volume
+          mountPath: /app/config
+          readOnly: true
+        - name: cache-volume
+          mountPath: /app/cache
+        - name: logs-volume
+          mountPath: /app/logs
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1000m"
+            nvidia.com/gpu: "1"
+          limits:
+            memory: "8Gi"
+            cpu: "4000m"
+            nvidia.com/gpu: "1"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          capabilities:
+            drop:
+            - ALL
+      volumes:
+      - name: config-volume
+        configMap:
+          name: dp-flash-config
+      - name: cache-volume
+        emptyDir:
+          sizeLimit: 10Gi
+      - name: logs-volume
+        emptyDir:
+          sizeLimit: 1Gi
+      nodeSelector:
+        accelerator: nvidia-tesla-v100
+      tolerations:
+      - key: nvidia.com/gpu
+        operator: Exists
+        effect: NoSchedule
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dp-flash-attention-service
+  namespace: dp-flash-attention
+  labels:
+    app: dp-flash-attention
+spec:
+  selector:
+    app: dp-flash-attention
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8000
+    protocol: TCP
+  - name: metrics
+    port: 8001
+    targetPort: 8001
+    protocol: TCP
+  type: ClusterIP
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dp-flash-attention-ingress
+  namespace: dp-flash-attention
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+spec:
+  tls:
+  - hosts:
+    - dp-flash-attention.example.com
+    secretName: dp-flash-attention-tls
+  rules:
+  - host: dp-flash-attention.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: dp-flash-attention-service
+            port:
+              number: 80
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: dp-flash-attention-hpa
+  namespace: dp-flash-attention
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: dp-flash-attention
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 10
+        periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+      - type: Percent
+        value: 50
+        periodSeconds: 60
+
+---
+apiVersion: v1
+kind: ServiceMonitor
+metadata:
+  name: dp-flash-attention-metrics
+  namespace: dp-flash-attention
+  labels:
+    app: dp-flash-attention
+spec:
+  selector:
+    matchLabels:
+      app: dp-flash-attention
+  endpoints:
+  - port: metrics
+    interval: 30s
+    path: /metrics
+    honorLabels: true
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: dp-flash-attention-netpol
+  namespace: dp-flash-attention
+spec:
+  podSelector:
+    matchLabels:
+      app: dp-flash-attention
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+    ports:
+    - protocol: TCP
+      port: 8000
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: monitoring
+    ports:
+    - protocol: TCP
+      port: 8001
+  egress:
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 53
+    - protocol: UDP
+      port: 53
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 443
