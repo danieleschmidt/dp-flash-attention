@@ -1,0 +1,48 @@
+{
+  "privacy": {
+    "epsilon": 1.0,
+    "delta": 1e-5,
+    "max_grad_norm": 1.0,
+    "noise_mechanism": "gaussian",
+    "secure_rng": true
+  },
+  "attention": {
+    "embed_dim": 768,
+    "num_heads": 12,
+    "dropout": 0.0,
+    "bias": true,
+    "batch_first": true
+  },
+  "performance": {
+    "use_flash_attention": true,
+    "use_checkpointing": false,
+    "checkpoint_segments": 4,
+    "max_sequence_length": 16384,
+    "memory_efficient": true,
+    "compile_kernels": false
+  },
+  "monitoring": {
+    "enable_privacy_tracking": true,
+    "enable_performance_tracking": true,
+    "enable_prometheus": true,
+    "enable_opentelemetry": false,
+    "prometheus_port": 8001,
+    "log_level": "INFO",
+    "alert_thresholds": {
+      "max_epsilon_per_hour": 10.0,
+      "max_duration_ms": 5000.0,
+      "max_memory_mb": 8192.0,
+      "max_gpu_utilization": 0.95
+    }
+  },
+  "security": {
+    "validate_inputs": true,
+    "use_secure_rng": true,
+    "enable_privacy_audit": true,
+    "memory_clearing": false,
+    "strict_mode": false
+  },
+  "device": "cuda",
+  "dtype": "float16",
+  "seed": null
+}

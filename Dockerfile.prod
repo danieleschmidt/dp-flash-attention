@@ -1,0 +1,99 @@
+# Multi-stage production Dockerfile for DP-Flash-Attention
+FROM nvidia/cuda:12.0-devel-ubuntu22.04 AS base
+
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV CUDA_VISIBLE_DEVICES=0
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    python3-dev \
+    build-essential \
+    ninja-build \
+    git \
+    curl \
+    wget \
+    && rm -rf /var/lib/apt/lists/*
+
+# Upgrade pip
+RUN python3 -m pip install --upgrade pip setuptools wheel
+
+# Create app directory
+WORKDIR /app
+
+# Copy requirements first for better caching
+COPY requirements.txt requirements-dev.txt ./
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Development stage
+FROM base AS development
+RUN pip install --no-cache-dir -r requirements-dev.txt
+COPY . .
+RUN pip install -e .
+CMD ["python3", "-m", "dp_flash_attention.cli", "--dev"]
+
+# Production stage
+FROM base AS production
+
+# Create non-root user
+RUN groupadd -r dpuser && useradd -r -g dpuser dpuser
+
+# Copy only necessary files
+COPY src/ ./src/
+COPY pyproject.toml ./
+COPY README.md ./
+COPY LICENSE ./
+
+# Install package in production mode
+RUN pip install --no-cache-dir .
+
+# Create necessary directories
+RUN mkdir -p /app/logs /app/config /app/cache && \
+    chown -R dpuser:dpuser /app
+
+# Copy configuration files
+COPY config/ ./config/
+COPY scripts/entrypoint.sh ./entrypoint.sh
+RUN chmod +x entrypoint.sh
+
+# Switch to non-root user
+USER dpuser
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD python3 -c "import dp_flash_attention; dp_flash_attention.privacy_check()" || exit 1
+
+# Expose ports
+EXPOSE 8000 8001
+
+# Set entrypoint
+ENTRYPOINT ["./entrypoint.sh"]
+CMD ["server"]
+
+# Minimal stage for CI/testing
+FROM python:3.10-slim AS testing
+WORKDIR /app
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+COPY src/ ./src/
+COPY tests/ ./tests/
+COPY pyproject.toml ./
+RUN pip install -e .
+CMD ["python3", "-m", "pytest", "tests/", "-v"]
+
+# Documentation stage
+FROM python:3.10-slim AS docs
+WORKDIR /app
+RUN pip install sphinx sphinx-rtd-theme myst-parser
+COPY docs/ ./docs/
+COPY src/ ./src/
+COPY pyproject.toml README.md ./
+RUN pip install -e .
+RUN cd docs && make html
+CMD ["python3", "-m", "http.server", "8080", "--directory", "docs/_build/html"]
