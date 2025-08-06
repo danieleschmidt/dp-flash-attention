@@ -20,6 +20,15 @@ try:
     PROMETHEUS_AVAILABLE = True
 except ImportError:
     PROMETHEUS_AVAILABLE = False
+    # Create dummy classes for type hints when prometheus is not available
+    class Counter:
+        pass
+    class Histogram:
+        pass
+    class Gauge:
+        pass
+    class CollectorRegistry:
+        pass
 
 try:
     from opentelemetry import trace, metrics
