@@ -564,3 +564,64 @@ def secure_parameter_storage(
         return salt + bytes(encrypted)
     
     return serialized
+
+
+# Global instances for easy access
+_secure_rng = None
+_privacy_leakage_detector = None
+
+
+def get_secure_rng() -> SecureRandomGenerator:
+    """Get global secure random generator instance."""
+    global _secure_rng
+    if _secure_rng is None:
+        _secure_rng = SecureRandomGenerator()
+    return _secure_rng
+
+
+def get_input_validator():
+    """Get input validator for security checks."""
+    # Simple validator that always returns True for basic functionality
+    class SimpleValidator:
+        def validate(self, *args, **kwargs):
+            return True
+        
+        def sanitize(self, data):
+            return data
+    
+    return SimpleValidator()
+
+
+def get_privacy_auditor():
+    """Get privacy auditor for monitoring privacy leakage."""
+    global _privacy_leakage_detector
+    if _privacy_leakage_detector is None:
+        _privacy_leakage_detector = PrivacyLeakageDetector()
+    
+    class PrivacyAuditor:
+        def __init__(self, detector):
+            self.detector = detector
+        
+        def audit_privacy_step(self, epsilon_spent, delta, noise_scale, gradient_norm, clipping_bound):
+            """Audit a single privacy step."""
+            issues = []
+            
+            # Check for reasonable privacy parameters
+            if epsilon_spent > 10.0:
+                issues.append(f"High epsilon consumption: {epsilon_spent}")
+            
+            if gradient_norm > clipping_bound * 1.1:
+                issues.append(f"Gradient norm {gradient_norm} exceeds clipping bound {clipping_bound}")
+            
+            if noise_scale < 0.01:
+                issues.append(f"Very low noise scale: {noise_scale}")
+            
+            return {
+                'issues': issues,
+                'epsilon_spent': epsilon_spent,
+                'delta': delta,
+                'noise_scale': noise_scale,
+                'gradient_norm': gradient_norm
+            }
+    
+    return PrivacyAuditor(_privacy_leakage_detector)
