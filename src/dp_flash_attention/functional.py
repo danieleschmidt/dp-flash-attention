@@ -13,6 +13,9 @@ from torch import Tensor
 from .kernels import dp_flash_attention_kernel
 from .privacy import PrivacyStats
 from .utils import validate_privacy_params, compute_noise_scale
+from .helper_functions import (_extract_attention_dims, _copy_attention_weights, 
+                              _replace_module, create_attention_mask, 
+                              estimate_privacy_cost, validate_attention_inputs)
 
 
 def dp_flash_attn_func(
@@ -254,6 +257,7 @@ def make_model_differentially_private(
     target_delta: float,
     num_epochs: int,
     batch_size: int,
+    dataset_size: int = 50000,
     replace_attention: bool = True,
 ) -> torch.nn.Module:
     """
@@ -267,48 +271,78 @@ def make_model_differentially_private(
         target_delta: Target privacy parameter  
         num_epochs: Number of training epochs
         batch_size: Training batch size
+        dataset_size: Size of training dataset
         replace_attention: Whether to replace attention layers
         
     Returns:
         Model with DP attention layers
     """
+    import copy
     from .core import DPFlashAttention
     
     if not replace_attention:
         warnings.warn("replace_attention=False, returning original model")
         return model
     
-    # Calculate per-step privacy budget
-    # Assuming one attention layer per transformer block
-    num_attention_layers = sum(
-        1 for name, _ in model.named_modules() 
-        if 'attention' in name.lower() or 'attn' in name.lower()
-    )
+    # Deep copy model to avoid modifying original
+    dp_model = copy.deepcopy(model)
     
-    if num_attention_layers == 0:
+    # Find all attention modules
+    attention_modules = []
+    for name, module in dp_model.named_modules():
+        # Common attention layer patterns
+        if any(pattern in name.lower() for pattern in ['attention', 'attn', 'self_attention', 'multihead']):
+            if hasattr(module, 'forward') and not isinstance(module, DPFlashAttention):
+                attention_modules.append((name, module))
+    
+    if not attention_modules:
         warnings.warn("No attention layers found in model")
-        return model
+        return dp_model
     
-    # Distribute privacy budget across layers and steps
-    total_steps = num_epochs * (50000 // batch_size)  # Estimate
-    per_layer_epsilon = target_epsilon / (num_attention_layers * total_steps)
+    # Calculate privacy budget allocation
+    total_steps = num_epochs * (dataset_size // batch_size)
+    num_layers = len(attention_modules)
+    per_step_epsilon = target_epsilon / total_steps
+    per_layer_epsilon = per_step_epsilon / num_layers
     
-    print(f"Converting {num_attention_layers} attention layers")
+    print(f"Converting {num_layers} attention layers")
+    print(f"Total training steps: {total_steps}")
+    print(f"Per-step epsilon: {per_step_epsilon:.6f}")
     print(f"Per-layer epsilon: {per_layer_epsilon:.6f}")
     
-    # Replace attention layers (simplified - would need model-specific logic)
-    for name, module in model.named_modules():
-        if hasattr(module, 'num_attention_heads') and hasattr(module, 'attention_head_size'):
-            # BERT-style attention
-            embed_dim = module.num_attention_heads * module.attention_head_size
-            dp_attention = DPFlashAttention(
-                embed_dim=embed_dim,
-                num_heads=module.num_attention_heads,
-                epsilon=per_layer_epsilon,
-                delta=target_delta,
-                max_grad_norm=1.0,
-            )
-            # Would need to copy weights and replace module properly
-            warnings.warn(f"Found attention layer {name} but replacement not fully implemented")
+    # Replace attention layers with DP versions
+    replacements_made = 0
+    for name, module in attention_modules:
+        try:
+            # Extract dimensions from different attention architectures
+            embed_dim, num_heads = _extract_attention_dims(module)
+            
+            if embed_dim and num_heads:
+                # Create DP attention replacement
+                dp_attention = DPFlashAttention(
+                    embed_dim=embed_dim,
+                    num_heads=num_heads,
+                    epsilon=per_layer_epsilon,
+                    delta=target_delta,
+                    max_grad_norm=1.0,
+                    dropout=getattr(module, 'dropout', 0.0) if hasattr(module, 'dropout') else 0.0,
+                    bias=getattr(module, 'bias', True),
+                    device=next(module.parameters()).device if list(module.parameters()) else None,
+                    dtype=next(module.parameters()).dtype if list(module.parameters()) else None,
+                )
+                
+                # Copy weights if possible
+                _copy_attention_weights(module, dp_attention)
+                
+                # Replace module in model
+                _replace_module(dp_model, name, dp_attention)
+                replacements_made += 1
+                print(f"Replaced {name} with DP-Flash-Attention")
+            else:
+                warnings.warn(f"Could not extract dimensions from {name}, skipping")
+                
+        except Exception as e:
+            warnings.warn(f"Failed to replace {name}: {e}")
     
-    return model
+    print(f"Successfully replaced {replacements_made} attention layers")
+    return dp_model

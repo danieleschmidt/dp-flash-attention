@@ -1,0 +1,115 @@
+{
+  "timestamp": 1754509233.6124623,
+  "test_coverage": {
+    "generation_1": {
+      "tests": 6,
+      "passed": 6,
+      "coverage": 1.0
+    },
+    "generation_2": {
+      "tests": 6,
+      "passed": 6,
+      "coverage": 1.0
+    },
+    "generation_3": {
+      "tests": 0,
+      "passed": 0,
+      "coverage": 0.0
+    },
+    "overall_coverage": 1.0,
+    "meets_threshold": true
+  },
+  "security_analysis": {
+    "privacy_leaks": [
+      {
+        "file": "quality_gates.py",
+        "line": 118,
+        "pattern": "log.*gradient",
+        "context": "       \"privacy_leaks\": [r\"print\\s*\\(.*tensor\", r\"log.*gradient\", r\"debug.*data\"]\n        }\n        \n        issu"
+      },
+      {
+        "file": "quality_gates.py",
+        "line": 118,
+        "pattern": "debug.*data",
+        "context": "aks\": [r\"print\\s*\\(.*tensor\", r\"log.*gradient\", r\"debug.*data\"]\n        }\n        \n        issues_found = 0\n   "
+      }
+    ],
+    "insecure_patterns": [],
+    "entropy_analysis": {
+      "os_entropy_available": true,
+      "entropy_quality": "good"
+    },
+    "code_injection_risks": [],
+    "security_score": 0.9852941176470589,
+    "meets_threshold": true
+  },
+  "performance_benchmarks": {
+    "memory_efficiency": {
+      "error": "No module named 'torch'"
+    },
+    "computation_speed": {
+      "avg_computation_ms": 2.4515550000160147,
+      "min_computation_ms": 2.2184929998729785,
+      "max_computation_ms": 2.5780570001643355,
+      "performance_acceptable": true
+    },
+    "scalability": {},
+    "privacy_overhead": {
+      "base_time_ms": 10.0,
+      "dp_time_ms": 12.0,
+      "overhead_percentage": 20.0,
+      "overhead_acceptable": true
+    },
+    "performance_score": 1.0,
+    "meets_threshold": true
+  },
+  "code_quality": {
+    "documentation_coverage": 0.9505703422053232,
+    "code_complexity": {
+      "average_complexity": 0.15204995689282522,
+      "acceptable": true
+    },
+    "style_compliance": {},
+    "maintainability_score": 1.0,
+    "meets_threshold": true
+  },
+  "integration_tests": {
+    "logic_integration": {
+      "successful": 2,
+      "total": 3,
+      "success_rate": 0.6666666666666666,
+      "details": [
+        [
+          "Generation 1 Logic",
+          true,
+          ""
+        ],
+        [
+          "Generation 2 Logic",
+          true,
+          ""
+        ],
+        [
+          "Generation 3 Logic",
+          false,
+          ""
+        ]
+      ]
+    },
+    "api_compatibility": {},
+    "cross_generation_compatibility": {
+      "successful": 3,
+      "total": 3,
+      "compatibility_score": 1.0
+    },
+    "integration_score": 0.8333333333333333,
+    "meets_threshold": true
+  },
+  "overall_quality": {
+    "overall_score": 0.9538395586371431,
+    "passed_gates": 5,
+    "total_gates": 5,
+    "pass_rate": 1.0,
+    "quality_gates_passed": true
+  }
+}

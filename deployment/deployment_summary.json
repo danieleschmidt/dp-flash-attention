@@ -1,0 +1,28 @@
+{
+  "deployment_timestamp": 1754509327.3549464,
+  "deployment_version": "1.0.0",
+  "files_created": [
+    "deployment/Dockerfile",
+    "deployment/docker-compose.yml",
+    "deployment/requirements.txt",
+    "deployment/deployment.yaml",
+    "deployment/hpa.yaml",
+    "deployment/network-policy.yaml",
+    "deployment/prometheus.yml",
+    "deployment/dp_flash_attention_rules.yml",
+    "deployment/grafana_dashboard.json",
+    "deployment/security_policy.md",
+    "deployment/env.template",
+    "deployment/deploy_docker.sh",
+    "deployment/deploy_k8s.sh",
+    "deployment/production_checklist.md"
+  ],
+  "deployment_ready": true,
+  "next_steps": [
+    "Review security configuration",
+    "Configure environment variables",
+    "Run deployment scripts",
+    "Validate deployment",
+    "Enable monitoring"
+  ]
+}
