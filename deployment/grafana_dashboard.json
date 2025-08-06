@@ -1,0 +1,42 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "DP-Flash-Attention Dashboard",
+    "version": 1,
+    "panels": [
+      {
+        "id": 1,
+        "title": "Privacy Budget",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "dp_privacy_budget_remaining",
+            "legendFormat": "Remaining Budget"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Inference Latency",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(dp_inference_duration_seconds_sum[5m]) / rate(dp_inference_duration_seconds_count[5m])",
+            "legendFormat": "Average Latency"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Memory Usage",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "dp_memory_usage_mb",
+            "legendFormat": "Memory (MB)"
+          }
+        ]
+      }
+    ]
+  }
+}

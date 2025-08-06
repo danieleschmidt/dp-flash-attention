@@ -1,0 +1,38 @@
+groups:
+- name: dp_flash_attention_alerts
+  rules:
+  - alert: PrivacyBudgetExhausted
+    expr: dp_privacy_budget_remaining < 0.1
+    for: 0m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Privacy budget nearly exhausted"
+      description: "Privacy budget remaining: {{ $value }}"
+  
+  - alert: HighMemoryUsage
+    expr: dp_memory_usage_mb > 6144
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High memory usage detected"
+      description: "Memory usage: {{ $value }}MB"
+  
+  - alert: SlowInference
+    expr: dp_inference_duration_seconds > 1.0
+    for: 1m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Slow inference detected"
+      description: "Inference time: {{ $value }}s"
+  
+  - alert: SecurityEvent
+    expr: increase(dp_security_events_total[5m]) > 0
+    for: 0m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Security event detected"
+      description: "{{ $value }} security events in 5 minutes"

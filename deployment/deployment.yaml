@@ -1,0 +1,121 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dp-flash-attention
+  labels:
+    app: dp-flash-attention
+    version: v1.0.0
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: dp-flash-attention
+  template:
+    metadata:
+      labels:
+        app: dp-flash-attention
+    spec:
+      containers:
+      - name: dp-flash-attention
+        image: dp-flash-attention:latest
+        ports:
+        - containerPort: 8080
+          name: api
+        - containerPort: 8081
+          name: metrics
+        
+        env:
+        - name: DP_FLASH_ATTENTION_LOG_LEVEL
+          value: "INFO"
+        - name: DP_FLASH_ATTENTION_SECURITY_MODE
+          value: "strict"
+        - name: DP_FLASH_ATTENTION_PRIVACY_BUDGET
+          valueFrom:
+            configMapKeyRef:
+              name: dp-config
+              key: privacy_budget
+        
+        resources:
+          limits:
+            cpu: "4"
+            memory: "8Gi"
+            nvidia.com/gpu: "1"
+          requests:
+            cpu: "2" 
+            memory: "4Gi"
+        
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8081
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8081
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
+        
+        volumeMounts:
+        - name: logs
+          mountPath: /app/logs
+        - name: config
+          mountPath: /app/config
+          readOnly: true
+        - name: tmp
+          mountPath: /tmp
+      
+      volumes:
+      - name: logs
+        emptyDir: {}
+      - name: config
+        configMap:
+          name: dp-config
+      - name: tmp
+        emptyDir: {}
+      
+      nodeSelector:
+        accelerator: nvidia-tesla-v100
+      
+      tolerations:
+      - key: nvidia.com/gpu
+        operator: Exists
+        effect: NoSchedule
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dp-flash-attention-service
+  labels:
+    app: dp-flash-attention
+spec:
+  selector:
+    app: dp-flash-attention
+  ports:
+  - name: api
+    port: 80
+    targetPort: 8080
+    protocol: TCP
+  - name: metrics
+    port: 8081
+    targetPort: 8081
+    protocol: TCP
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dp-config
+data:
+  privacy_budget: "1.0"
+  max_workers: "4"
+  log_level: "INFO"
+  security_mode: "strict"
