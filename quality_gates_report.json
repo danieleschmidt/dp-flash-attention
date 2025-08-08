@@ -1,5 +1,5 @@
 {
-  "timestamp": 1754509233.6124623,
+  "timestamp": 1754683497.238633,
   "test_coverage": {
     "generation_1": {
       "tests": 6,
@@ -40,7 +40,7 @@
       "entropy_quality": "good"
     },
     "code_injection_risks": [],
-    "security_score": 0.9852941176470589,
+    "security_score": 0.9857142857142858,
     "meets_threshold": true
   },
   "performance_benchmarks": {
@@ -48,9 +48,9 @@
       "error": "No module named 'torch'"
     },
     "computation_speed": {
-      "avg_computation_ms": 2.4515550000160147,
-      "min_computation_ms": 2.2184929998729785,
-      "max_computation_ms": 2.5780570001643355,
+      "avg_computation_ms": 2.2039806000066164,
+      "min_computation_ms": 2.05037299997457,
+      "max_computation_ms": 2.4969910000436357,
       "performance_acceptable": true
     },
     "scalability": {},
@@ -64,9 +64,9 @@
     "meets_threshold": true
   },
   "code_quality": {
-    "documentation_coverage": 0.9505703422053232,
+    "documentation_coverage": 0.9518518518518518,
     "code_complexity": {
-      "average_complexity": 0.15204995689282522,
+      "average_complexity": 0.15235243064054405,
       "acceptable": true
     },
     "style_compliance": {},
@@ -106,7 +106,7 @@
     "meets_threshold": true
   },
   "overall_quality": {
-    "overall_score": 0.9538395586371431,
+    "overall_score": 0.9541798941798941,
     "passed_gates": 5,
     "total_gates": 5,
     "pass_rate": 1.0,
