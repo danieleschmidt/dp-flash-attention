@@ -1,0 +1,149 @@
+{
+  "test_name": "comprehensive_robustness_test",
+  "success_rate": 0.11666666666666667,
+  "error_recovery_rate": 0.335,
+  "average_recovery_time_ms": 50.626197089555454,
+  "stress_test_passed": false,
+  "fault_tolerance_score": 0.3355,
+  "edge_cases_handled": 6,
+  "performance_degradation": 0.17227166119669776,
+  "memory_leak_detected": false,
+  "thread_safety_verified": true,
+  "details": {
+    "recovery_results": {
+      "recovery_rate": 0.335,
+      "successful_recoveries": 67,
+      "total_trials": 200,
+      "average_recovery_time_ms": 50.626197089555454,
+      "error_types_encountered": {
+        "RuntimeError": 129,
+        "PrivacyParameterError": 261,
+        "MemoryError": 58
+      }
+    },
+    "concurrency_results": {
+      "success_rate": 0.11666666666666667,
+      "successful_operations": 35,
+      "total_operations": 300,
+      "errors": 0,
+      "average_completion_time_ms": 335.9771005833447,
+      "thread_safety_issues": 0,
+      "thread_safety_verified": true,
+      "error_distribution": {}
+    },
+    "edge_case_results": {
+      "edge_cases_tested": 6,
+      "edge_cases_passed": 6,
+      "edge_cases_handled": 6,
+      "success_rate": 1.0,
+      "detailed_results": [
+        {
+          "success": true,
+          "runtime_ms": 21.465068999987125,
+          "batch_size": 1,
+          "seq_len": 1,
+          "embed_dim": 64,
+          "case_name": "minimal_size",
+          "parameters": {
+            "batch_size": 1,
+            "seq_len": 1,
+            "embed_dim": 64
+          }
+        },
+        {
+          "success": true,
+          "runtime_ms": 23.458587999982683,
+          "batch_size": 1000,
+          "seq_len": 8192,
+          "embed_dim": 2048,
+          "case_name": "large_size",
+          "parameters": {
+            "batch_size": 1000,
+            "seq_len": 8192,
+            "embed_dim": 2048
+          }
+        },
+        {
+          "success": true,
+          "runtime_ms": 43.46290000000863,
+          "batch_size": 7,
+          "seq_len": 511,
+          "embed_dim": 513,
+          "case_name": "prime_dimensions",
+          "parameters": {
+            "batch_size": 7,
+            "seq_len": 511,
+            "embed_dim": 513
+          }
+        },
+        {
+          "success": true,
+          "runtime_ms": 28.462194000042018,
+          "batch_size": 2,
+          "seq_len": 3,
+          "embed_dim": 5,
+          "case_name": "tiny_primes",
+          "parameters": {
+            "batch_size": 2,
+            "seq_len": 3,
+            "embed_dim": 5
+          }
+        },
+        {
+          "success": true,
+          "runtime_ms": 13.512645999981032,
+          "batch_size": 16,
+          "seq_len": 512,
+          "embed_dim": 768,
+          "case_name": "mixed_powers",
+          "parameters": {
+            "batch_size": 16,
+            "seq_len": 512,
+            "embed_dim": 768
+          }
+        },
+        {
+          "success": true,
+          "runtime_ms": 25.355921999960174,
+          "batch_size": 15,
+          "seq_len": 511,
+          "embed_dim": 767,
+          "case_name": "non_powers",
+          "parameters": {
+            "batch_size": 15,
+            "seq_len": 511,
+            "embed_dim": 767
+          }
+        }
+      ]
+    },
+    "memory_leak_results": {
+      "iterations_tested": 100,
+      "memory_leak_detected": false,
+      "object_growth_rate": 0.0,
+      "initial_objects": 29,
+      "final_objects": 29,
+      "memory_usage_samples": [
+        29,
+        29,
+        29,
+        29,
+        29,
+        29,
+        29,
+        29,
+        29,
+        29
+      ]
+    },
+    "stress_results": {
+      "passed": false,
+      "operations_completed": 1944,
+      "errors_encountered": 1710,
+      "duration_seconds": 30,
+      "average_runtime_ms": 29.306791529917444,
+      "performance_degradation": 0.17227166119669776,
+      "throughput_ops_per_sec": 64.8
+    }
+  }
+}
