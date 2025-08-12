@@ -1,0 +1,561 @@
+{
+  "batch_scaling": [
+    {
+      "config": {
+        "seq_len": 512,
+        "num_heads": 12,
+        "head_dim": 64
+      },
+      "metrics": {
+        "batch_sizes": [
+          1,
+          1,
+          3,
+          5,
+          10,
+          19,
+          35,
+          64
+        ],
+        "throughput_ops_per_sec": [
+          84064672240.46622,
+          87706279605.97113,
+          173338229303.36966,
+          210065324103.43484,
+          268740408984.79703,
+          347540944247.93365,
+          362238472468.336,
+          379510134464.2414
+        ],
+        "latency_ms": [
+          2.4065563288783416,
+          2.302417550790859,
+          3.501797207662016,
+          4.795226341347187,
+          7.499194257772672,
+          11.042787398768004,
+          19.560469587032767,
+          34.07975180051458
+        ],
+        "memory_usage_mb": [
+          8.25,
+          8.25,
+          24.75,
+          41.25,
+          82.5,
+          156.75,
+          288.75,
+          528.0
+        ],
+        "efficiency_scores": [
+          4234123722.3472238,
+          4617348487.033334,
+          1999991548.6294296,
+          1061992144.484907,
+          434374599.573784,
+          200779660.82070255,
+          64134734.9446827,
+          21090798.966740433
+        ],
+        "scaling_factor": 0.37744888025764595,
+        "bottleneck_type": "memory_bandwidth",
+        "optimal_batch_size": 1,
+        "max_throughput": 379510134464.2414
+      }
+    },
+    {
+      "config": {
+        "seq_len": 1024,
+        "num_heads": 16,
+        "head_dim": 64
+      },
+      "metrics": {
+        "batch_sizes": [
+          1,
+          1,
+          3,
+          5,
+          10,
+          19,
+          35,
+          64
+        ],
+        "throughput_ops_per_sec": [
+          312618538835.31476,
+          333821267138.9898,
+          572105392728.087,
+          670868735037.2871,
+          761886319449.6586,
+          834698912323.7778,
+          860493254187.1066,
+          972223515964.3813
+        ],
+        "latency_ms": [
+          3.4401828665531973,
+          3.229518617926748,
+          5.638063782865234,
+          8.021318086180093,
+          14.130049688017612,
+          24.5191456540344,
+          43.817506146837864,
+          70.7551022924873
+        ],
+        "memory_usage_mb": [
+          38.0,
+          38.0,
+          114.0,
+          190.0,
+          380.0,
+          722.0,
+          1330.0,
+          2432.0
+        ],
+        "efficiency_scores": [
+          2391385566.6061,
+          2720148488.7266903,
+          890104927.9569452,
+          440188014.14034104,
+          141893626.9029512,
+          47150610.08491943,
+          14765500.505553726,
+          5649952.383849207
+        ],
+        "scaling_factor": 0.2628645905102679,
+        "bottleneck_type": "memory_bandwidth",
+        "optimal_batch_size": 1,
+        "max_throughput": 972223515964.3813
+      }
+    },
+    {
+      "config": {
+        "seq_len": 2048,
+        "num_heads": 20,
+        "head_dim": 80
+      },
+      "metrics": {
+        "batch_sizes": [
+          1,
+          1,
+          3,
+          5,
+          10,
+          19,
+          35,
+          64
+        ],
+        "throughput_ops_per_sec": [
+          1212239380948.7742,
+          1208500395436.4285,
+          1626788616156.3157,
+          1720823839619.697,
+          1726688044868.791,
+          1925071257883.6934,
+          1963207692392.6243,
+          1893803543534.2566
+        ],
+        "latency_ms": [
+          5.550774224965629,
+          5.580121414493829,
+          12.429084026816392,
+          19.566732070970247,
+          38.86831853562359,
+          66.35090890628271,
+          120.32798756630093,
+          227.41308268116953
+        ],
+        "memory_usage_mb": [
+          178.75,
+          178.75,
+          536.25,
+          893.75,
+          1787.5,
+          3396.25,
+          6256.25,
+          11440.0
+        ],
+        "efficiency_scores": [
+          1221768081.295108,
+          1211593954.839458,
+          244075785.3516406,
+          98401577.53923371,
+          24852614.216264155,
+          8542800.846572865,
+          2607867.360688338,
+          727936.431095938
+        ],
+        "scaling_factor": 0.11517279969889224,
+        "bottleneck_type": "memory_bandwidth",
+        "optimal_batch_size": 1,
+        "max_throughput": 1963207692392.6243
+      }
+    }
+  ],
+  "sequence_scaling": [
+    {
+      "config": {
+        "seq_len": 512,
+        "num_heads": 12,
+        "head_dim": 64,
+        "batch_size": 16
+      },
+      "metrics": {
+        "batch_sizes": [
+          128,
+          222,
+          388,
+          675,
+          1176,
+          2048
+        ],
+        "throughput_ops_per_sec": [
+          41205028422.15925,
+          100324839582.9187,
+          210837147133.80014,
+          454963609162.49506,
+          941980029721.9072,
+          1705684171647.0999
+        ],
+        "latency_ms": [
+          4.91103102502737,
+          6.0453444448173235,
+          8.808419482236845,
+          12.309938295275586,
+          18.093269464548182,
+          30.249020161671652
+        ],
+        "memory_usage_mb": [
+          15.0,
+          33.65771484375,
+          82.412109375,
+          214.3157958984375,
+          589.1484375,
+          1680.0
+        ],
+        "efficiency_scores": [
+          559353398.6675043,
+          493063434.67770076,
+          290441126.16379607,
+          172451351.81193534,
+          88368994.67089956,
+          33564333.38939862
+        ],
+        "scaling_factor": 1.3442363792373824,
+        "bottleneck_type": "memory_capacity",
+        "optimal_batch_size": 128,
+        "max_throughput": 1705684171647.0999
+      }
+    },
+    {
+      "config": {
+        "seq_len": 1024,
+        "num_heads": 16,
+        "head_dim": 64,
+        "batch_size": 16
+      },
+      "metrics": {
+        "batch_sizes": [
+          128,
+          222,
+          388,
+          675,
+          1176,
+          2048
+        ],
+        "throughput_ops_per_sec": [
+          50463516434.15182,
+          110843096894.68678,
+          244249342017.6113,
+          509552721725.4515,
+          978433679639.5265,
+          1813891823757.5342
+        ],
+        "latency_ms": [
+          5.326391837523968,
+          7.2864422909566775,
+          10.104122733138249,
+          14.674654799597048,
+          23.266690369744918,
+          37.912523219779054
+        ],
+        "memory_usage_mb": [
+          20.0,
+          44.876953125,
+          109.8828125,
+          285.75439453125,
+          785.53125,
+          2240.0
+        ],
+        "efficiency_scores": [
+          473712017.19183266,
+          338976630.4604764,
+          219991055.1349897,
+          121514558.63598706,
+          53534446.450657174,
+          21358988.187406674
+        ],
+        "scaling_factor": 1.2966407883646918,
+        "bottleneck_type": "memory_capacity",
+        "optimal_batch_size": 128,
+        "max_throughput": 1813891823757.5342
+      }
+    },
+    {
+      "config": {
+        "seq_len": 2048,
+        "num_heads": 20,
+        "head_dim": 80,
+        "batch_size": 16
+      },
+      "metrics": {
+        "batch_sizes": [
+          128,
+          222,
+          388,
+          675,
+          1176,
+          2048
+        ],
+        "throughput_ops_per_sec": [
+          61078246261.76714,
+          142733655810.2622,
+          273458542033.9528,
+          569300235179.8014,
+          1042807239885.5297,
+          1757001068641.4846
+        ],
+        "latency_ms": [
+          6.888977206216968,
+          8.845497931592922,
+          14.128222489439901,
+          20.528380497120146,
+          34.09461615860884,
+          61.12690552958037
+        ],
+        "memory_usage_mb": [
+          28.75,
+          62.60009765625,
+          148.720703125,
+          376.9683837890625,
+          1016.3671875,
+          2860.0
+        ],
+        "efficiency_scores": [
+          308385508.60968214,
+          257768054.33627406,
+          130146513.55634513,
+          73566779.88035715,
+          30093146.29460296,
+          10050174.021801991
+        ],
+        "scaling_factor": 1.2099006773788548,
+        "bottleneck_type": "memory_capacity",
+        "optimal_batch_size": 128,
+        "max_throughput": 1757001068641.4846
+      }
+    }
+  ],
+  "distributed_scaling": {
+    "1": {
+      "num_workers": 1,
+      "total_tasks": 50,
+      "successful_tasks": 50,
+      "total_time_seconds": 56.11734652519226,
+      "tasks_per_second": 0.8909900965747543,
+      "total_throughput_ops_per_sec": 284807825469.5305,
+      "average_latency_ms": 1122.1790537999914,
+      "efficiency": 1.0
+    },
+    "2": {
+      "num_workers": 2,
+      "total_tasks": 50,
+      "successful_tasks": 50,
+      "total_time_seconds": 28.27043342590332,
+      "tasks_per_second": 1.7686322401476362,
+      "total_throughput_ops_per_sec": 275517848731.58984,
+      "average_latency_ms": 1123.3175624599971,
+      "efficiency": 1.0
+    },
+    "4": {
+      "num_workers": 4,
+      "total_tasks": 50,
+      "successful_tasks": 50,
+      "total_time_seconds": 14.704056024551392,
+      "tasks_per_second": 3.4004222995692412,
+      "total_throughput_ops_per_sec": 321308010329.5636,
+      "average_latency_ms": 1138.660696199995,
+      "efficiency": 1.0
+    },
+    "8": {
+      "num_workers": 8,
+      "total_tasks": 50,
+      "successful_tasks": 50,
+      "total_time_seconds": 7.879616737365723,
+      "tasks_per_second": 6.345486292867053,
+      "total_throughput_ops_per_sec": 368492822266.8068,
+      "average_latency_ms": 1136.0494518000087,
+      "efficiency": 1.0
+    },
+    "16": {
+      "num_workers": 16,
+      "total_tasks": 50,
+      "successful_tasks": 50,
+      "total_time_seconds": 4.341545104980469,
+      "tasks_per_second": 11.516637231902013,
+      "total_throughput_ops_per_sec": 313718807387.0178,
+      "average_latency_ms": 1125.6059926399894,
+      "efficiency": 1.0
+    }
+  },
+  "optimization": {
+    "conservative": {
+      "workload_0": {
+        "workload": [
+          8,
+          512,
+          12,
+          64
+        ],
+        "base_performance_ops_per_sec": 1000,
+        "optimized_performance_ops_per_sec": 1100.0,
+        "improvement_factor": 1.1,
+        "optimization_time_seconds": 0.10026630999993813
+      },
+      "workload_1": {
+        "workload": [
+          32,
+          512,
+          12,
+          64
+        ],
+        "base_performance_ops_per_sec": 1000,
+        "optimized_performance_ops_per_sec": 1100.0,
+        "improvement_factor": 1.1,
+        "optimization_time_seconds": 0.1002346679999846
+      },
+      "workload_2": {
+        "workload": [
+          64,
+          1024,
+          16,
+          64
+        ],
+        "base_performance_ops_per_sec": 1000,
+        "optimized_performance_ops_per_sec": 1100.0,
+        "improvement_factor": 1.1,
+        "optimization_time_seconds": 0.10025101099995481
+      },
+      "workload_3": {
+        "workload": [
+          16,
+          2048,
+          20,
+          80
+        ],
+        "base_performance_ops_per_sec": 1000,
+        "optimized_performance_ops_per_sec": 1100.0,
+        "improvement_factor": 1.1,
+        "optimization_time_seconds": 0.10034043799998926
+      }
+    },
+    "balanced": {
+      "workload_0": {
+        "workload": [
+          8,
+          512,
+          12,
+          64
+        ],
+        "base_performance_ops_per_sec": 1000,
+        "optimized_performance_ops_per_sec": 1300.0,
+        "improvement_factor": 1.3,
+        "optimization_time_seconds": 0.30046793400003935
+      },
+      "workload_1": {
+        "workload": [
+          32,
+          512,
+          12,
+          64
+        ],
+        "base_performance_ops_per_sec": 1000,
+        "optimized_performance_ops_per_sec": 1300.0,
+        "improvement_factor": 1.3,
+        "optimization_time_seconds": 0.300227628000016
+      },
+      "workload_2": {
+        "workload": [
+          64,
+          1024,
+          16,
+          64
+        ],
+        "base_performance_ops_per_sec": 1000,
+        "optimized_performance_ops_per_sec": 1300.0,
+        "improvement_factor": 1.3,
+        "optimization_time_seconds": 0.30031066300000475
+      },
+      "workload_3": {
+        "workload": [
+          16,
+          2048,
+          20,
+          80
+        ],
+        "base_performance_ops_per_sec": 1000,
+        "optimized_performance_ops_per_sec": 1300.0,
+        "improvement_factor": 1.3,
+        "optimization_time_seconds": 0.3002320599999848
+      }
+    },
+    "aggressive": {
+      "workload_0": {
+        "workload": [
+          8,
+          512,
+          12,
+          64
+        ],
+        "base_performance_ops_per_sec": 1000,
+        "optimized_performance_ops_per_sec": 1600.0,
+        "improvement_factor": 1.6,
+        "optimization_time_seconds": 0.7003376819999403
+      },
+      "workload_1": {
+        "workload": [
+          32,
+          512,
+          12,
+          64
+        ],
+        "base_performance_ops_per_sec": 1000,
+        "optimized_performance_ops_per_sec": 1600.0,
+        "improvement_factor": 1.6,
+        "optimization_time_seconds": 0.7002617050000026
+      },
+      "workload_2": {
+        "workload": [
+          64,
+          1024,
+          16,
+          64
+        ],
+        "base_performance_ops_per_sec": 1000,
+        "optimized_performance_ops_per_sec": 1600.0,
+        "improvement_factor": 1.6,
+        "optimization_time_seconds": 0.700271857999951
+      },
+      "workload_3": {
+        "workload": [
+          16,
+          2048,
+          20,
+          80
+        ],
+        "base_performance_ops_per_sec": 1000,
+        "optimized_performance_ops_per_sec": 1600.0,
+        "improvement_factor": 1.6,
+        "optimization_time_seconds": 0.7004704780000566
+      }
+    }
+  }
+}
