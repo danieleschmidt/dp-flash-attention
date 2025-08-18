@@ -5,7 +5,7 @@ This library provides CUDA-optimized implementations of differential privacy
 mechanisms integrated directly into Flash-Attention 3 kernels.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"  # Updated with breakthrough research features
 __author__ = "Daniel Schmidt"
 __email__ = "daniel@dp-flash-attention.org"
 
@@ -34,6 +34,28 @@ except ImportError as e:
     _SCALING_AVAILABLE = False
     import warnings
     warnings.warn(f"Scaling features not available: {e}")
+
+# Import breakthrough research mechanisms (with error handling)
+try:
+    from .advanced_research_mechanisms import (
+        PrivacyLossDistribution,
+        AttentionSensitivityAnalyzer, 
+        StructuredNoiseMechanism,
+        AdvancedCompositionAnalyzer,
+        create_research_mechanism,
+        PrivacyMechanismType
+    )
+    from .comparative_research_framework import (
+        ComparativeResearchFramework,
+        BenchmarkType,
+        create_standard_baselines
+    )
+    _RESEARCH_AVAILABLE = True
+except ImportError as e:
+    # Graceful degradation if research modules have issues
+    _RESEARCH_AVAILABLE = False
+    import warnings
+    warnings.warn(f"Research features not available: {e}")
 
 __all__ = [
     "DPFlashAttention",
@@ -85,4 +107,20 @@ if _SCALING_AVAILABLE:
         # Distributed processing
         "DistributedStrategy",
         "create_distributed_config",
+    ])
+
+# Add breakthrough research features if available
+if _RESEARCH_AVAILABLE:
+    __all__.extend([
+        # Advanced privacy mechanisms
+        "PrivacyLossDistribution",
+        "AttentionSensitivityAnalyzer",
+        "StructuredNoiseMechanism",
+        "AdvancedCompositionAnalyzer",
+        "create_research_mechanism",
+        "PrivacyMechanismType",
+        # Comparative research framework
+        "ComparativeResearchFramework",
+        "BenchmarkType",
+        "create_standard_baselines",
     ])
