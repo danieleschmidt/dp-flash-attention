@@ -77,7 +77,7 @@ ENTRYPOINT ["./entrypoint.sh"]
 CMD ["server"]
 
 # Minimal stage for CI/testing
-FROM python:3.13-slim AS testing
+FROM python:3.13.7-slim AS testing
 WORKDIR /app
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
@@ -88,7 +88,7 @@ RUN pip install -e .
 CMD ["python3", "-m", "pytest", "tests/", "-v"]
 
 # Documentation stage
-FROM python:3.13-slim AS docs
+FROM python:3.13.7-slim AS docs
 WORKDIR /app
 RUN pip install sphinx sphinx-rtd-theme myst-parser
 COPY docs/ ./docs/
