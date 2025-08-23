@@ -1,129 +1,79 @@
-# Docker Compose configuration for DP-Flash-Attention development
 version: '3.8'
 
 services:
-  # Development environment with CUDA support
-  dev:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: development
-    volumes:
-      - .:/workspaces/dp-flash-attention
-      - venv-cache:/workspaces/dp-flash-attention/.venv
+  dp-flash-attention:
+    build: .
+    image: dp-flash-attention:latest
+    container_name: dp-flash-attention-production
+    restart: unless-stopped
     environment:
-      - CUDA_VISIBLE_DEVICES=all
-      - PYTHONPATH=/workspaces/dp-flash-attention/src
-    working_dir: /workspaces/dp-flash-attention
-    command: tail -f /dev/null  # Keep container running
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
-
-  # Testing environment
-  test:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: testing
-    volumes:
-      - .:/workspaces/dp-flash-attention
-    environment:
-      - CUDA_VISIBLE_DEVICES=all
-      - PYTHONPATH=/workspaces/dp-flash-attention/src
-    command: python -m pytest tests/ -v
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
-
-  # Production-like environment
-  prod:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: production
-    environment:
-      - CUDA_VISIBLE_DEVICES=all
-    command: python -c "import dp_flash_attention; dp_flash_attention.privacy_check()"
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
-
-  # Documentation server
-  docs:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: development
-    volumes:
-      - .:/workspaces/dp-flash-attention
-    working_dir: /workspaces/dp-flash-attention
-    command: make docs-serve
+      - ENVIRONMENT=production
+      - PYTHONUNBUFFERED=1
     ports:
       - "8000:8000"
-
-  # Jupyter notebook server for examples
-  jupyter:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: development
+      - "9090:9090"
     volumes:
-      - .:/workspaces/dp-flash-attention
-    environment:
-      - CUDA_VISIBLE_DEVICES=all
-      - PYTHONPATH=/workspaces/dp-flash-attention/src
-    working_dir: /workspaces/dp-flash-attention
-    command: jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root --NotebookApp.token=''
+      - ./logs:/app/logs
+      - ./config:/app/config:ro
+    networks:
+      - dp-flash-network
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /app/tmp:size=100M
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 8Gi
+        reservations:
+          cpus: '1.0'
+          memory: 2Gi
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus-production
+    restart: unless-stopped
     ports:
-      - "8888:8888"
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
-
-  # Benchmarking service
-  benchmark:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: development
+      - "9091:9090"
     volumes:
-      - .:/workspaces/dp-flash-attention
-      - ./benchmark_results:/app/benchmark_results
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    networks:
+      - dp-flash-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana-production
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
     environment:
-      - CUDA_VISIBLE_DEVICES=all
-      - PYTHONPATH=/workspaces/dp-flash-attention/src
-    working_dir: /workspaces/dp-flash-attention
-    command: python -m pytest tests/benchmarks/ -v --benchmark-only --benchmark-json=benchmark_results/results.json
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+      - GF_USERS_ALLOW_SIGN_UP=false
+    networks:
+      - dp-flash-network
+
+networks:
+  dp-flash-network:
+    driver: bridge
 
 volumes:
-  venv-cache:
-    driver: local
-
-# Network configuration
-networks:
-  default:
-    driver: bridge
+  prometheus_data:
+  grafana_data:

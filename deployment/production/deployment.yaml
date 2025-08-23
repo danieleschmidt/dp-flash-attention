@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dp-flash-attention-production
+  labels:
+    app: dp-flash-attention
+    environment: production
+    version: v1.0.0
+spec:
+  replicas: 5
+  strategy:
+    type: Recreate
+    
+    
+    
+  selector:
+    matchLabels:
+      app: dp-flash-attention
+      environment: production
+  template:
+    metadata:
+      labels:
+        app: dp-flash-attention
+        environment: production
+        version: v1.0.0
+    spec:
+      containers:
+      - name: dp-flash-attention
+        image: dp-flash-attention:latest
+        ports:
+        - containerPort: 8000
+          name: http
+        - containerPort: 9090
+          name: metrics
+        env:
+        - name: ENVIRONMENT
+          value: production
+        - name: PYTHONUNBUFFERED
+          value: "1"
+        - name: DP_FLASH_LOG_LEVEL
+          value: INFO
+        resources:
+          requests:
+            cpu: 1000m
+            memory: 2Gi
+          limits:
+            cpu: 4000m
+            memory: 8Gi
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 10
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 1000
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
