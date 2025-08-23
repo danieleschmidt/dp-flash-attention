@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: dp-flash-attention-service-production
+  labels:
+    app: dp-flash-attention
+    environment: production
+spec:
+  selector:
+    app: dp-flash-attention
+    environment: production
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8000
+    protocol: TCP
+  - name: metrics
+    port: 9090
+    targetPort: 9090
+    protocol: TCP
+  type: LoadBalancer

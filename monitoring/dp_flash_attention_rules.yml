@@ -1,0 +1,52 @@
+groups:
+  - name: dp_flash_attention_production
+    rules:
+      - alert: HighMemoryUsage
+        expr: container_memory_usage_bytes{container_name="dp-flash-attention-production"} / container_spec_memory_limit_bytes > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          environment: production
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is above 90% for { $labels.container_name }"
+
+      - alert: HighCPUUsage
+        expr: rate(container_cpu_usage_seconds_total{container_name="dp-flash-attention-production"}[5m]) > 0.8
+        for: 5m
+        labels:
+          severity: warning
+          environment: production
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is above 80% for { $labels.container_name }"
+
+      - alert: ServiceDown
+        expr: up{job="dp-flash-attention-production"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          environment: production
+        annotations:
+          summary: "Service is down"
+          description: "DP-Flash-Attention service is not responding"
+
+      - alert: PrivacyBudgetExhausted
+        expr: dp_flash_privacy_budget_remaining < 0.1
+        for: 1m
+        labels:
+          severity: critical
+          environment: production
+        annotations:
+          summary: "Privacy budget nearly exhausted"
+          description: "Privacy budget is below 10%"
+
+      - alert: HighErrorRate
+        expr: rate(dp_flash_errors_total[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+          environment: production
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is above 10% for the past 5 minutes"
