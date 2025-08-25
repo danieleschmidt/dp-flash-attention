@@ -1,5 +1,5 @@
 # Production Dockerfile for DP-Flash-Attention
-FROM python:3.11-slim as builder
+FROM python:3.13-slim as builder
 
 # Security: Create non-root user
 RUN groupadd -r dpflash && useradd -r -g dpflash dpflash
@@ -18,7 +18,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Production stage
-FROM python:3.11-slim
+FROM python:3.13-slim
 
 # Security: Create non-root user
 RUN groupadd -r dpflash && useradd -r -g dpflash dpflash
