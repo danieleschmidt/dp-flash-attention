@@ -1,0 +1,37 @@
+{
+  "timestamp": 1756186364.7949574,
+  "tests_run": 5,
+  "failures": 5,
+  "errors": 0,
+  "success_rate": 0.0,
+  "health_status": "POOR",
+  "generation5_available": true,
+  "torch_available": true,
+  "test_details": [
+    {
+      "test_name": "test_adaptive_privacy (__main__.Generation5TestSuite.test_adaptive_privacy)",
+      "status": "FAILURE",
+      "error": "(<class 'AssertionError'>, AssertionError(\"False is not true : Adaptive privacy test failed: 'PrivacyMetricsLogger' object has no attribute 'info'\"), <traceback object at 0x7f00d2be9f80>)"
+    },
+    {
+      "test_name": "test_edge_optimization (__main__.Generation5TestSuite.test_edge_optimization)",
+      "status": "FAILURE",
+      "error": "(<class 'AssertionError'>, AssertionError(\"False is not true : Edge optimization test failed: 'PrivacyMetricsLogger' object has no attribute 'info'\"), <traceback object at 0x7f00d16110c0>)"
+    },
+    {
+      "test_name": "test_integration_comprehensive (__main__.Generation5TestSuite.test_integration_comprehensive)",
+      "status": "FAILURE",
+      "error": "(<class 'AssertionError'>, AssertionError(\"False is not true : Integration test failed: 'PrivacyMetricsLogger' object has no attribute 'info'\"), <traceback object at 0x7f00d132a000>)"
+    },
+    {
+      "test_name": "test_multimodal_attention (__main__.Generation5TestSuite.test_multimodal_attention)",
+      "status": "FAILURE",
+      "error": "(<class 'AssertionError'>, AssertionError(\"False is not true : Multi-modal test failed: 'PrivacyMetricsLogger' object has no attribute 'info'\"), <traceback object at 0x7f00d1329b00>)"
+    },
+    {
+      "test_name": "test_quantum_privacy_mechanisms (__main__.Generation5TestSuite.test_quantum_privacy_mechanisms)",
+      "status": "FAILURE",
+      "error": "(<class 'AssertionError'>, AssertionError(\"False is not true : Quantum privacy test failed: 'PrivacyMetricsLogger' object has no attribute 'info'\"), <traceback object at 0x7f00d1329040>)"
+    }
+  ]
+}

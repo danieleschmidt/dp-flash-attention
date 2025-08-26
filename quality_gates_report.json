@@ -1,5 +1,5 @@
 {
-  "timestamp": 1755131384.493533,
+  "timestamp": 1756186454.5837405,
   "test_coverage": {
     "generation_1": {
       "tests": 6,
@@ -12,9 +12,9 @@
       "coverage": 1.0
     },
     "generation_3": {
-      "tests": 0,
-      "passed": 0,
-      "coverage": 0.0
+      "tests": 8,
+      "passed": 8,
+      "coverage": 1.0
     },
     "overall_coverage": 1.0,
     "meets_threshold": true
@@ -32,6 +32,570 @@
         "line": 118,
         "pattern": "debug.*data",
         "context": "aks\": [r\"print\\s*\\(.*tensor\", r\"log.*gradient\", r\"debug.*data\"]\n        }\n        \n        issues_found = 0\n   "
+      },
+      {
+        "file": "src/dp_flash_attention/generation5_edge_optimization.py",
+        "line": 273,
+        "pattern": "log.*gradient",
+        "context": "ent += len(compressed_data)\n        \n        self.logger.info(f\"Gradient compression: {compression_ratio:.3f} ratio, \"\n   "
+      },
+      {
+        "file": "src/dp_flash_attention/generation5_quantum_privacy.py",
+        "line": 427,
+        "pattern": "print\\s*\\(.*tensor",
+        "context": "on=1.0, \n            delta=1e-5\n        )\n        print(f\"\u2705 Quantum noise added. Shape: {noised_tensor.shape}\")\n        \n        # Test privacy accounti"
+      },
+      {
+        "file": "src/dp_flash_attention/quantum_privacy_mechanisms.py",
+        "line": 564,
+        "pattern": "print\\s*\\(.*tensor",
+        "context": "dn(100, 64)  # Simulate attention weights\n        print(f\"\ud83d\udcca Processing tensor data: {sensitive_data.shape}\")\n    else:\n        "
+      },
+      {
+        "file": "src/dp_flash_attention/quantum_resistant_privacy.py",
+        "line": 595,
+        "pattern": "print\\s*\\(.*tensor",
+        "context": "tensor = mechanism.add_noise(test_tensor)\n        print(f\"Noise added successfully, tensor shape: {noisy_tensor.shape}\")\n    \n    logger.info(\"Quantum-resistant "
+      },
+      {
+        "file": "src/dp_flash_attention/threat_detection_system.py",
+        "line": 816,
+        "pattern": "log.*gradient",
+        "context": "\"Execute gradient protection measures.\"\"\"\n        logger.info(\"\ud83d\udee1\ufe0f Activating gradient protection\")\n        \n        # Increase gradient"
+      },
+      {
+        "file": "src/dp_flash_attention/threat_detection_system.py",
+        "line": 820,
+        "pattern": "log.*gradient",
+        "context": "ameters.get('gradient_noise_factor', 2.0)\n        logger.info(f\"\ud83d\udd0a Increasing gradient noise by {gradient_noise_factor}x\")\n        \n        # Enable timing"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/PIL/TiffImagePlugin.py",
+        "line": 1025,
+        "pattern": "debug.*data",
+        "context": "count, value, data in entries:\n            logger.debug(\"%s %s %s %s %s\", tag, typ, count, repr(value), repr(data))\n            result += self._pack(\n             "
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/PIL/TiffImagePlugin.py",
+        "line": 1651,
+        "pattern": "debug.*data",
+        "context": "      layer += 1\n        else:\n            logger.debug(\"- unsupported data organization\")\n            msg = \"unknown data or"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/matplotlib/__init__.py",
+        "line": 1444,
+        "pattern": "debug.*data",
+        "context": "ect, optional\" not in docstring:\n            _log.debug(\"data parameter docstring error: no data parameter\")\n        if 'DATA_PARAMETER_PLACEHOLDE"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/matplotlib/__init__.py",
+        "line": 1446,
+        "pattern": "debug.*data",
+        "context": "R_PLACEHOLDER' not in docstring:\n            _log.debug(\"data parameter docstring error: missing placeholder\")\n"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/pip/_vendor/urllib3/contrib/ntlmpool.py",
+        "line": 75,
+        "pattern": "debug.*data",
+        "context": "debug(\"Response headers: %s\", reshdr)\n        log.debug(\"Response data: %s [...]\", res.read(100))\n\n        # Remove the "
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/pip/_vendor/urllib3/contrib/ntlmpool.py",
+        "line": 105,
+        "pattern": "debug.*data",
+        "context": "onse headers: %s\", dict(res.headers))\n        log.debug(\"Response data: %s [...]\", res.read()[:100])\n        if res.stat"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/functorch/dim/reference.py",
+        "line": 240,
+        "pattern": "print\\s*\\(.*tensor",
+        "context": "       with _enable_layers(all_dims):\n            print(f\"batch_tensor for {orig}\")\n            args, kwargs = unflatten"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/functorch/dim/reference.py",
+        "line": 338,
+        "pattern": "print\\s*\\(.*tensor",
+        "context": "  with _enable_layers(self.dims):\n                print(f\"dim fallback batch_tensor for {orig}\")\n                return Tensor.from_b"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/functorch/dim/reference.py",
+        "line": 366,
+        "pattern": "print\\s*\\(.*tensor",
+        "context": "     with _enable_layers(new_levels):\n            print(f\"dim used batch_tensor for {orig}\")\n            r = orig(t, *args, **kwa"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/_functorch/aot_autograd.py",
+        "line": 212,
+        "pattern": "log.*gradient",
+        "context": " way, during the x.copy_(x_updated) bit in the epilogue, gradients will flow from the updated input\n# back to the o"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/_functorch/functional_call.py",
+        "line": 39,
+        "pattern": "print\\s*\\(.*tensor",
+        "context": ")  # does self.foo = self.foo + 1\n            >>> print(mod.foo)  # tensor(0.)\n            >>> functional_call(mod, a, torch"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/_functorch/functional_call.py",
+        "line": 41,
+        "pattern": "print\\s*\\(.*tensor",
+        "context": "onal_call(mod, a, torch.ones(()))\n            >>> print(mod.foo)  # tensor(0.)\n            >>> print(a['foo'])  # tensor(1.)"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/_functorch/functional_call.py",
+        "line": 42,
+        "pattern": "print\\s*\\(.*tensor",
+        "context": " >>> print(mod.foo)  # tensor(0.)\n            >>> print(a['foo'])  # tensor(1.)\n\n    .. note:: If the module has tied weights"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/_functorch/functional_call.py",
+        "line": 52,
+        "pattern": "print\\s*\\(.*tensor",
+        "context": "urns x + self.foo + self.foo_tied\n            >>> print(mod.foo)  # tensor(1.)\n            >>> mod(torch.zeros(()))  # tenso"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/_functorch/functional_call.py",
+        "line": 65,
+        "pattern": "print\\s*\\(.*tensor",
+        "context": " return self.weight @ x + self.buffer\n            print(mod.weight)  # tensor(...)\n            print(mod.buffer)  # tensor(...)"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/_functorch/functional_call.py",
+        "line": 66,
+        "pattern": "print\\s*\\(.*tensor",
+        "context": "     print(mod.weight)  # tensor(...)\n            print(mod.buffer)  # tensor(...)\n            x = torch.randn((1, 1))\n        "
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/_inductor/compile_fx_ext.py",
+        "line": 636,
+        "pattern": "debug.*data",
+        "context": "d.name)\n            logger.handle(record)\n\n\n# For debugging - create a _FxCompile which writes the serialized data to a file\n# and then exits.\n#\n# TODO: make this a"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/_inductor/output_code.py",
+        "line": 78,
+        "pattern": "debug.*data",
+        "context": "eld(default=None, init=False)\n    _fx_graph_cache_debug_lines: Optional[list[str]] = dataclasses.field(\n        default=None, init=False\n  "
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/_lazy/extract_compiled_graph.py",
+        "line": 200,
+        "pattern": "print\\s*\\(.*tensor",
+        "context": ":\n        print(\"graph_hash\", graph_hash)\n        print(f\"args_tensor_ids {args_tensor_ids}\")\n        print(\"tensor ids from device data"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/_lazy/extract_compiled_graph.py",
+        "line": 201,
+        "pattern": "print\\s*\\(.*tensor",
+        "context": "int(f\"args_tensor_ids {args_tensor_ids}\")\n        print(\"tensor ids from device data:\", graph_input_tensor_ids)\n\n    # sync the list of output tensors so th"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/_library/custom_ops.py",
+        "line": 246,
+        "pattern": "print\\s*\\(.*tensor",
+        "context": "rn torch.zeros(1)\n            >>>\n            >>> print(f(inp))  # tensor([0.]), default kernel\n            >>>\n           "
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/_library/custom_ops.py",
+        "line": 252,
+        "pattern": "print\\s*\\(.*tensor",
+        "context": "urn torch.ones(1)\n            >>>\n            >>> print(f(inp))  # tensor([1.]), CPU kernel\n            >>>\n            >>>"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/_library/custom_ops.py",
+        "line": 256,
+        "pattern": "print\\s*\\(.*tensor",
+        "context": "bled(\"cpu\", enabled = False):\n            >>>     print(f(inp))  # tensor([0.]) with CPU kernel disabled\n\n        \"\"\"\n     "
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/_logging/_internal.py",
+        "line": 319,
+        "pattern": "debug.*data",
+        "context": "lass:`Optional[int]`):\n            Whether to log debug info related to ``DistributedDataParallel``(DDP) from PyTorch Distributed component"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/_logging/_internal.py",
+        "line": 323,
+        "pattern": "debug.*data",
+        "context": "lass:`Optional[int]`):\n            Whether to log debug info related to ``FullyShardedDataParallel``(FSDP) in PyTorch Distributed components"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/distributions/transforms.py",
+        "line": 61,
+        "pattern": "log.*gradient",
+        "context": " or without caching::\n\n        y = t(x)\n        t.log_abs_det_jacobian(x, y).backward()  # x will receive gradients.\n\n    However the following will error when cach"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/_export/serde/serialize.py",
+        "line": 1568,
+        "pattern": "debug.*data",
+        "context": " if custom := meta.get(\"custom\"):\n            log.debug(\"\\n[serialize_graph_module_metadata] %s\", custom)\n            try:\n                re"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/input_output_analysis.py",
+        "line": 101,
+        "pattern": "debug.*data",
+        "context": "ynthetic base calling convention.\n#\n# When config.debug_assert is set, we automatically regenerate the metadata\n# and compare it to this output for sanity.\n#\n# I"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/_inductor/codegen/common.py",
+        "line": 89,
+        "pattern": "debug.*data",
+        "context": "isEnabledFor(logging.DEBUG):\n        schedule_log.debug(\"Data type propagation: %s\", msg)\n\n\n@dataclasses.datacl"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/_inductor/fx_passes/numeric_utils.py",
+        "line": 156,
+        "pattern": "log.*gradient",
+        "context": ": %s\", res)\n        except Exception:\n            logger.exception(\"Exception when comparing gradients\")\n            traceback.print_exc()\n\n        if "
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/distributed/fsdp/_runtime_utils.py",
+        "line": 956,
+        "pattern": "log.*gradient",
+        "context": "Tensor,\n):\n    \"\"\"\n    This callback captures any logic to run after the gradient reduction\n    finishes. Currently, this offloads "
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/distributed/rpc/functions.py",
+        "line": 66,
+        "pattern": "print\\s*\\(.*tensor",
+        "context": "\", torch.ones(2), 1, 1)\n        >>> )\n        >>> print(ret)  # prints tensor([3., 3.])\n\n        When combined with TorchScript"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/distributed/rpc/functions.py",
+        "line": 93,
+        "pattern": "print\\s*\\(.*tensor",
+        "context": "er2\", torch.ones(2), 1)\n        >>> )\n        >>> print(ret)  # prints tensor([2., 2.])\n\n        When combined with static or c"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/distributed/rpc/functions.py",
+        "line": 133,
+        "pattern": "print\\s*\\(.*tensor",
+        "context": "\", torch.ones(2), 1, 2)\n        >>> )\n        >>> print(ret)  # prints tensor([4., 4.])\n        >>>\n        >>> ret = rpc.rpc_s"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/distributed/rpc/functions.py",
+        "line": 140,
+        "pattern": "print\\s*\\(.*tensor",
+        "context": "\", torch.ones(2), 1, 2)\n        >>> )\n        >>> print(ret)  # prints tensor([4., 4.])\n\n        This decorator also works with"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/distributed/rpc/functions.py",
+        "line": 152,
+        "pattern": "print\\s*\\(.*tensor",
+        "context": "c_add(\"worker2\", torch.ones(2), 1, 2)\n        >>> print(ret)  # prints tensor([4., 4.])\n        >>>\n        >>> rref = rpc.remo"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/distributed/rpc/functions.py",
+        "line": 156,
+        "pattern": "print\\s*\\(.*tensor",
+        "context": "worker2\", torch.ones(2), 1, 2).wait()\n        >>> print(ret)  # prints tensor([4., 4.])\n        >>>\n        >>> rref = rpc.remo"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/distributed/rpc/functions.py",
+        "line": 160,
+        "pattern": "print\\s*\\(.*tensor",
+        "context": "ker2\", torch.ones(2), 1, 2).to_here()\n        >>> print(ret)  # prints tensor([4., 4.])\n    \"\"\"\n\n    @functools.wraps(fn)\n    d"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/distributed/rpc/options.py",
+        "line": 128,
+        "pattern": "print\\s*\\(.*tensor",
+        "context": "           >>> def add(x, y):\n            >>>     print(x)  # tensor([1., 1.], device='cuda:1')\n            >>>     re"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/distributed/rpc/options.py",
+        "line": 154,
+        "pattern": "print\\s*\\(.*tensor",
+        "context": "          >>> # cuda:1 on worker0\n            >>> print(rets[0])  # tensor([2., 2.], device='cuda:0')\n            >>> print("
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/distributed/rpc/options.py",
+        "line": 155,
+        "pattern": "print\\s*\\(.*tensor",
+        "context": "tensor([2., 2.], device='cuda:0')\n            >>> print(rets[1])  # tensor([2., 2.], device='cuda:1')\n        \"\"\"\n        fu"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/distributed/tensor/_redistribute.py",
+        "line": 252,
+        "pattern": "log.*gradient",
+        "context": "ack to partial, although\n                # that's logically conform with the same layout, converting the gradients\n                # back to partial is actually us"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/distributed/fsdp/_fully_shard/_fsdp_param_group.py",
+        "line": 68,
+        "pattern": "log.*gradient",
+        "context": "e execution \"thread\" for post-\n        # backward logic like pre/post-gradient division and reduce-scatter\n        self.reduce_s"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/distributed/tensor/debug/_visualize_sharding.py",
+        "line": 225,
+        "pattern": "print\\s*\\(.*tensor",
+        "context": "lif importlib.util.find_spec(\"tabulate\"):\n        print(_create_table(shards, device_kind=dtensor.device_mesh.device_type))\n    else:\n        raise"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/fx/experimental/_config.py",
+        "line": 6,
+        "pattern": "debug.*data",
+        "context": "rom typing import Optional\n\n\n# [@compile_ignored: debug] Fails hard instead of graph breaking on guard on data dependent errors.\nno_data_dependent_graph_break ="
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/fx/passes/shape_prop.py",
+        "line": 122,
+        "pattern": "print\\s*\\(.*tensor",
+        "context": "\n\n        for node in gm.graph.nodes:\n            print(node.name, node.meta['tensor_meta'].dtype,\n                node.meta['tensor_m"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/nn/parallel/distributed.py",
+        "line": 2310,
+        "pattern": "debug.*data",
+        "context": "ionary of logging data. It could help\n        for debugging and analysis. The logging data includes DistributedDataParallel\n        constructor input parameters, som"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/nn/utils/stateless.py",
+        "line": 199,
+        "pattern": "print\\s*\\(.*tensor",
+        "context": ")  # does self.foo = self.foo + 1\n            >>> print(mod.foo)  # tensor(0.)\n            >>> functional_call(mod, a, torch"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/nn/utils/stateless.py",
+        "line": 201,
+        "pattern": "print\\s*\\(.*tensor",
+        "context": "onal_call(mod, a, torch.ones(()))\n            >>> print(mod.foo)  # tensor(0.)\n            >>> print(a['foo'])  # tensor(1.)"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/nn/utils/stateless.py",
+        "line": 202,
+        "pattern": "print\\s*\\(.*tensor",
+        "context": " >>> print(mod.foo)  # tensor(0.)\n            >>> print(a['foo'])  # tensor(1.)\n\n    .. note:: If the module has tied weights"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/nn/utils/stateless.py",
+        "line": 212,
+        "pattern": "print\\s*\\(.*tensor",
+        "context": "urns x + self.foo + self.foo_tied\n            >>> print(mod.foo)  # tensor(1.)\n            >>> mod(torch.zeros(()))  # tenso"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/testing/_internal/composite_compliance.py",
+        "line": 317,
+        "pattern": "debug.*data",
+        "context": " = list(args) + list(flat_kwargs)\n    for choice, debug_metadata in generate_subclass_choices(flat_args_kwargs, CC"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/testing/_internal/composite_compliance.py",
+        "line": 320,
+        "pattern": "debug.*data",
+        "context": "n(args):], spec)\n        which_args_are_wrapped = debug_metadata[:len(args)]\n        which_kwargs_are_wrapped = tr"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/testing/_internal/composite_compliance.py",
+        "line": 321,
+        "pattern": "debug.*data",
+        "context": "        which_kwargs_are_wrapped = tree_unflatten(debug_metadata[len(args):], spec)\n        yield new_args, new_kw"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/testing/_internal/logging_tensor.py",
+        "line": 28,
+        "pattern": "log.*gradient",
+        "context": "ll be tracked\n#    for the wrapped Tensor and the LoggingTensor itself cannot require gradients.\n# WARNING: We allow these two possibilities for"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/testing/_internal/distributed/distributed_test.py",
+        "line": 6227,
+        "pattern": "log.*gradient",
+        "context": "parameters\"), 0)\n            self.assertEqual(ddp_logging_data.get(\"gradient_as_bucket_view\"), 0)\n            self.assertEqual"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/testing/_internal/distributed/distributed_test.py",
+        "line": 4532,
+        "pattern": "debug.*data",
+        "context": "get_ddp_logging_data()\n            # Note: DETAIL debug mode logs DDP logging data to stdout and\n            # thus accesses std::ma"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/testing/_internal/distributed/distributed_test.py",
+        "line": 6281,
+        "pattern": "debug.*data",
+        "context": "runtime logging fields\n            # Note: DETAIL debug mode logs DDP logging data to stdout and\n            # thus accesses std::ma"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torch/utils/benchmark/utils/compile.py",
+        "line": 33,
+        "pattern": "print\\s*\\(.*tensor",
+        "context": " if not _warned_tensor_cores:\n                    print(\"Your GPU supports tensor cores\")\n                    print(\"we will enable"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/torchgen/selective_build/selector.py",
+        "line": 97,
+        "pattern": "debug.*data",
+        "context": "ors, bool)\n\n        debug_info = None\n        if \"debug_info\" in data:\n            di_list = data[\"debug_info\"]\n       "
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/fontTools/cffLib/__init__.py",
+        "line": 2484,
+        "pattern": "debug.*data",
+        "context": "t\n\n    def decompile(self, data):\n        log.log(DEBUG, \"    length %s is %d\", self.__class__.__name__, len(data))\n        dec = self.decompilerClass(self.strings"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/fontTools/ttLib/tables/otTables.py",
+        "line": 1702,
+        "pattern": "debug.*data",
+        "context": "      or \"Debg\" not in font\n            or LOOKUP_DEBUG_INFO_KEY not in font[\"Debg\"].data\n        ):\n            return super().toXML2(xmlW"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/fontTools/ttLib/tables/otTables.py",
+        "line": 1705,
+        "pattern": "debug.*data",
+        "context": "   return super().toXML2(xmlWriter, font)\n        debugData = font[\"Debg\"].data[LOOKUP_DEBUG_INFO_KEY][self.table]\n        for co"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/fontTools/ttLib/tables/otTables.py",
+        "line": 1710,
+        "pattern": "debug.*data",
+        "context": "alue):\n                    if str(lookupIndex) in debugData:\n                        info = LookupDebugInfo(*"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/fontTools/ttLib/tables/otTables.py",
+        "line": 1711,
+        "pattern": "debug.*data",
+        "context": "n debugData:\n                        info = LookupDebugInfo(*debugData[str(lookupIndex)])\n                        tag = "
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/scipy/ndimage/__init__.py",
+        "line": 117,
+        "pattern": "log.*gradient",
+        "context": "ion\n   grey_opening\n   iterate_structure\n   morphological_gradient\n   morphological_laplace\n   white_tophat\n\n\"\"\"\n\n# "
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/scipy/ndimage/_delegators.py",
+        "line": 231,
+        "pattern": "log.*gradient",
+        "context": "r_signature = median_filter_signature\n\n\ndef morphological_gradient_signature(\n    input, size=None, footprint=None, "
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/scipy/ndimage/_delegators.py",
+        "line": 236,
+        "pattern": "log.*gradient",
+        "context": "tprint, structure, _skip_if_dtype(output))\n\nmorphological_laplace_signature = morphological_gradient_signature\nwhite_tophat_signature = morphological_"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/scipy/ndimage/_delegators.py",
+        "line": 237,
+        "pattern": "log.*gradient",
+        "context": "gradient_signature\nwhite_tophat_signature = morphological_gradient_signature\nblack_tophat_signature = morphological_"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/scipy/ndimage/_delegators.py",
+        "line": 238,
+        "pattern": "log.*gradient",
+        "context": "gradient_signature\nblack_tophat_signature = morphological_gradient_signature\ngrey_closing_signature = morphological_"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/scipy/ndimage/_delegators.py",
+        "line": 239,
+        "pattern": "log.*gradient",
+        "context": "gradient_signature\ngrey_closing_signature = morphological_gradient_signature\ngrey_dilation_signature = morphological"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/scipy/ndimage/_delegators.py",
+        "line": 240,
+        "pattern": "log.*gradient",
+        "context": "radient_signature\ngrey_dilation_signature = morphological_gradient_signature\ngrey_erosion_signature = morphological_"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/scipy/ndimage/_delegators.py",
+        "line": 241,
+        "pattern": "log.*gradient",
+        "context": "gradient_signature\ngrey_erosion_signature = morphological_gradient_signature\ngrey_opening_signature = morphological_"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/scipy/ndimage/_delegators.py",
+        "line": 242,
+        "pattern": "log.*gradient",
+        "context": "gradient_signature\ngrey_opening_signature = morphological_gradient_signature\n\n\ndef percentile_filter_signature(\n    "
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/scipy/ndimage/_morphology.py",
+        "line": 43,
+        "pattern": "log.*gradient",
+        "context": "'grey_opening', 'grey_closing',\n           'morphological_gradient', 'morphological_laplace', 'white_tophat',\n      "
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/scipy/ndimage/_morphology.py",
+        "line": 1633,
+        "pattern": "log.*gradient",
+        "context": "             cval, origin, axes=axes)\n\n\ndef morphological_gradient(input, size=None, footprint=None, structure=None,"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/scipy/ndimage/_morphology.py",
+        "line": 1637,
+        "pattern": "log.*gradient",
+        "context": "   axes=None):\n    \"\"\"\n    Multidimensional morphological gradient.\n\n    The morphological gradient is calculated as"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/scipy/ndimage/_morphology.py",
+        "line": 1639,
+        "pattern": "log.*gradient",
+        "context": "imensional morphological gradient.\n\n    The morphological gradient is calculated as the difference between a\n    dil"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/scipy/ndimage/_morphology.py",
+        "line": 1645,
+        "pattern": "log.*gradient",
+        "context": "like\n        Array over which to compute the morphlogical gradient.\n    size : tuple of ints\n        Shape of a flat"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/scipy/ndimage/_morphology.py",
+        "line": 1653,
+        "pattern": "log.*gradient",
+        "context": "rger footprints\n        give a more blurred morphological gradient.\n    structure : array of ints, optional\n        "
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/scipy/ndimage/_morphology.py",
+        "line": 1660,
+        "pattern": "log.*gradient",
+        "context": "An array used for storing the output of the morphological gradient\n        may be provided.\n    mode : {'reflect', '"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/scipy/ndimage/_morphology.py",
+        "line": 1679,
+        "pattern": "log.*gradient",
+        "context": "umber of axes.\n\n    Returns\n    -------\n    morphological_gradient : ndarray\n        Morphological gradient of `inpu"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/scipy/ndimage/_morphology.py",
+        "line": 1680,
+        "pattern": "log.*gradient",
+        "context": "   morphological_gradient : ndarray\n        Morphological gradient of `input`.\n\n    See Also\n    --------\n    grey_d"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/scipy/ndimage/_morphology.py",
+        "line": 1688,
+        "pattern": "log.*gradient",
+        "context": "---\n    For a flat structuring element, the morphological gradient\n    computed at a given point corresponds to the "
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/scipy/ndimage/_morphology.py",
+        "line": 1703,
+        "pattern": "log.*gradient",
+        "context": "nt)\n    >>> a[2:5, 2:5] = 1\n    >>> ndimage.morphological_gradient(a, size=(3,3))\n    array([[0, 0, 0, 0, 0, 0, 0],\n"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/scipy/ndimage/_morphology.py",
+        "line": 1711,
+        "pattern": "log.*gradient",
+        "context": "      [0, 0, 0, 0, 0, 0, 0]])\n    >>> # The morphological gradient is computed as the difference\n    >>> # between a"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/scipy/ndimage/_morphology.py",
+        "line": 1733,
+        "pattern": "log.*gradient",
+        "context": "    [0, 0, 0, 0, 0, 0, 0]])\n    >>> ndimage.morphological_gradient(a, size=(3,3))\n    array([[0, 0, 0, 0, 0, 0, 0],\n"
+      },
+      {
+        "file": "dp_env_new/lib/python3.12/site-packages/scipy/ndimage/morphology.py",
+        "line": 13,
+        "pattern": "log.*gradient",
+        "context": "tion',\n    'grey_opening', 'grey_closing', 'morphological_gradient',\n    'morphological_laplace', 'white_tophat', 'b"
       }
     ],
     "insecure_patterns": [],
@@ -40,17 +604,21 @@
       "entropy_quality": "good"
     },
     "code_injection_risks": [],
-    "security_score": 0.9883720930232558,
+    "security_score": 0.9962645914396887,
     "meets_threshold": true
   },
   "performance_benchmarks": {
     "memory_efficiency": {
-      "error": "No module named 'torch'"
+      "small_workload_mb": 5.0,
+      "medium_workload_mb": 864.0,
+      "large_workload_mb": 8704.0,
+      "scaling_factor": 1740.8,
+      "memory_efficient": false
     },
     "computation_speed": {
-      "avg_computation_ms": 2.139653199969871,
-      "min_computation_ms": 2.0934619999479764,
-      "max_computation_ms": 2.2243549999529932,
+      "avg_computation_ms": 2.260504800005947,
+      "min_computation_ms": 2.0220049999579714,
+      "max_computation_ms": 2.464067999994768,
       "performance_acceptable": true
     },
     "scalability": {},
@@ -64,9 +632,9 @@
     "meets_threshold": true
   },
   "code_quality": {
-    "documentation_coverage": 0.9241573033707865,
+    "documentation_coverage": 0.9222343921139102,
     "code_complexity": {
-      "average_complexity": 0.14130382938668484,
+      "average_complexity": 0.1523369152793469,
       "acceptable": true
     },
     "style_compliance": {},
@@ -75,9 +643,9 @@
   },
   "integration_tests": {
     "logic_integration": {
-      "successful": 2,
+      "successful": 3,
       "total": 3,
-      "success_rate": 0.6666666666666666,
+      "success_rate": 1.0,
       "details": [
         [
           "Generation 1 Logic",
@@ -91,7 +659,7 @@
         ],
         [
           "Generation 3 Logic",
-          false,
+          true,
           ""
         ]
       ]
@@ -102,11 +670,11 @@
       "total": 3,
       "compatibility_score": 1.0
     },
-    "integration_score": 0.8333333333333333,
+    "integration_score": 1.0,
     "meets_threshold": true
   },
   "overall_quality": {
-    "overall_score": 0.9491725459454751,
+    "overall_score": 0.9836997967107198,
     "passed_gates": 5,
     "total_gates": 5,
     "pass_rate": 1.0,
