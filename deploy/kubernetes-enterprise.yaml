@@ -1,0 +1,339 @@
+# Enhanced Enterprise Kubernetes Configuration for DP-Flash-Attention
+# Adds advanced features: RBAC, PVC, PDB, VPA, Service Mesh, Backup Jobs
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: dp-flash-attention-storage
+  namespace: dp-flash-attention
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi
+  storageClassName: fast-ssd
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: dp-flash-attention-pdb
+  namespace: dp-flash-attention
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: dp-flash-attention
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: dp-flash-attention-sa
+  namespace: dp-flash-attention
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::ACCOUNT:role/dp-flash-attention-role
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: dp-flash-attention-role
+  namespace: dp-flash-attention
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "endpoints"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "replicasets"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["metrics.k8s.io"]
+  resources: ["pods", "nodes"]
+  verbs: ["get", "list"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: dp-flash-attention-rolebinding
+  namespace: dp-flash-attention
+subjects:
+- kind: ServiceAccount
+  name: dp-flash-attention-sa
+  namespace: dp-flash-attention
+roleRef:
+  kind: Role
+  name: dp-flash-attention-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: autoscaling/v2
+kind: VerticalPodAutoscaler
+metadata:
+  name: dp-flash-attention-vpa
+  namespace: dp-flash-attention
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: dp-flash-attention
+  updatePolicy:
+    updateMode: "Auto"
+  resourcePolicy:
+    containerPolicies:
+    - containerName: dp-flash-attention
+      minAllowed:
+        cpu: 500m
+        memory: 1Gi
+      maxAllowed:
+        cpu: 8
+        memory: 16Gi
+      controlledResources: ["cpu", "memory"]
+
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: dp-flash-attention-backup
+  namespace: dp-flash-attention
+spec:
+  schedule: "0 2 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: dp-flash-attention-sa
+          containers:
+          - name: backup
+            image: dp-flash-attention:latest
+            command:
+            - /bin/sh
+            - -c
+            - "python3 /app/scripts/backup_privacy_params.py"
+            volumeMounts:
+            - name: storage-volume
+              mountPath: /app/data
+            env:
+            - name: BACKUP_RETENTION_DAYS
+              value: "30"
+            - name: ENABLE_ENCRYPTION
+              value: "true"
+          volumes:
+          - name: storage-volume
+            persistentVolumeClaim:
+              claimName: dp-flash-attention-storage
+          restartPolicy: OnFailure
+
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: dp-flash-attention-vs
+  namespace: dp-flash-attention
+spec:
+  hosts:
+  - dp-flash-attention.example.com
+  gateways:
+  - dp-flash-attention-gateway
+  http:
+  - match:
+    - uri:
+        prefix: "/api/v1/"
+    route:
+    - destination:
+        host: dp-flash-attention-service
+        port:
+          number: 80
+    retries:
+      attempts: 3
+      perTryTimeout: 30s
+    timeout: 120s
+    fault:
+      delay:
+        percentage:
+          value: 0.1
+        fixedDelay: 5s
+
+---
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: dp-flash-attention-gateway
+  namespace: dp-flash-attention
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      credentialName: dp-flash-attention-tls
+    hosts:
+    - dp-flash-attention.example.com
+
+---
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: dp-flash-attention-peer-auth
+  namespace: dp-flash-attention
+spec:
+  selector:
+    matchLabels:
+      app: dp-flash-attention
+  mtls:
+    mode: STRICT
+
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: dp-flash-attention-authz
+  namespace: dp-flash-attention
+spec:
+  selector:
+    matchLabels:
+      app: dp-flash-attention
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/ingress-nginx/sa/nginx-ingress-serviceaccount"]
+    to:
+    - operation:
+        methods: ["GET", "POST"]
+  - from:
+    - source:
+        principals: ["cluster.local/ns/monitoring/sa/prometheus"]
+    to:
+    - operation:
+        methods: ["GET"]
+        paths: ["/metrics"]
+
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: dp-flash-attention-dr
+  namespace: dp-flash-attention
+spec:
+  host: dp-flash-attention-service
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+    connectionPool:
+      tcp:
+        maxConnections: 100
+      http:
+        http1MaxPendingRequests: 50
+        maxRequestsPerConnection: 10
+    circuitBreaker:
+      consecutiveErrors: 3
+      interval: 30s
+      baseEjectionTime: 30s
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dp-flash-monitoring-config
+  namespace: dp-flash-attention
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+    
+    rule_files:
+      - "/etc/prometheus/rules/*.yml"
+    
+    scrape_configs:
+      - job_name: 'dp-flash-attention'
+        kubernetes_sd_configs:
+        - role: pod
+          namespaces:
+            names:
+            - dp-flash-attention
+        relabel_configs:
+        - source_labels: [__meta_kubernetes_pod_label_app]
+          action: keep
+          regex: dp-flash-attention
+        - source_labels: [__meta_kubernetes_pod_container_port_name]
+          action: keep
+          regex: metrics
+
+  alerting.yml: |
+    groups:
+    - name: dp-flash-attention
+      rules:
+      - alert: DPFlashAttentionDown
+        expr: up{job="dp-flash-attention"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "DP-Flash-Attention service is down"
+          description: "DP-Flash-Attention has been down for more than 1 minute"
+      
+      - alert: HighPrivacyBudgetUsage
+        expr: dp_privacy_budget_usage > 0.8
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High privacy budget usage detected"
+          description: "Privacy budget usage is above 80%"
+      
+      - alert: HighMemoryUsage
+        expr: (container_memory_usage_bytes{pod=~"dp-flash-attention-.*"} / container_spec_memory_limit_bytes) > 0.9
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage is above 90%"
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: dp-flash-attention-registry-secret
+  namespace: dp-flash-attention
+type: kubernetes.io/dockerconfigjson
+data:
+  .dockerconfigjson: eyJhdXRocyI6eyJyZWdpc3RyeS5leGFtcGxlLmNvbSI6eyJ1c2VybmFtZSI6ImRwLWZsYXNoIiwicGFzc3dvcmQiOiJzZWN1cmUtcGFzc3dvcmQiLCJhdXRoIjoiWkdBeVpteGhjMmc2YzJWamRYSmxMWEJoYzNOM2IzSmsifX19
+
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+metadata:
+  name: dp-flash-attention-kustomization
+  namespace: dp-flash-attention
+resources:
+- kubernetes.yaml
+- kubernetes-enterprise.yaml
+
+patchesStrategicMerge:
+- overlays/production/deployment-patch.yaml
+
+images:
+- name: dp-flash-attention
+  newTag: v1.2.0
+  
+commonLabels:
+  version: v1.2.0
+  environment: production
+  
+configMapGenerator:
+- name: app-config
+  files:
+  - config/production.json
+  
+secretGenerator:
+- name: app-secrets
+  files:
+  - secrets/private-key.pem
+  - secrets/certificate.crt

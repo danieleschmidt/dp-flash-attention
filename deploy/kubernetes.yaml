@@ -80,10 +80,24 @@ spec:
       labels:
         app: dp-flash-attention
     spec:
+      serviceAccountName: dp-flash-attention-sa
       containers:
       - name: dp-flash-attention
         image: dp-flash-attention:latest
         imagePullPolicy: IfNotPresent
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sh", "-c", "sleep 15"]
+        startupProbe:
+          httpGet:
+            path: /startup
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 10
+          successThreshold: 1
         ports:
         - containerPort: 8000
           name: http
@@ -112,6 +126,8 @@ spec:
           mountPath: /app/cache
         - name: logs-volume
           mountPath: /app/logs
+        - name: storage-volume
+          mountPath: /app/data
         resources:
           requests:
             memory: "2Gi"
@@ -155,6 +171,9 @@ spec:
       - name: logs-volume
         emptyDir:
           sizeLimit: 1Gi
+      - name: storage-volume
+        persistentVolumeClaim:
+          claimName: dp-flash-attention-storage
       nodeSelector:
         accelerator: nvidia-tesla-v100
       tolerations:
